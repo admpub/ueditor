@@ -6,8 +6,8 @@ var fs = require('fs'),
 
 function writeFile(dst,src){
     var buf;
-    if(encoding != 'utf8' && /\.(jsp|ashx|php|html|js|css|config|java|cs)$/.test(src)){
-        buf = fs.readFileSync(src,'utf8');
+    if(encoding != 'utf-8' && /\.(jsp|ashx|php|html|js|css|config|java|cs)$/.test(src)){
+        buf = fs.readFileSync(src,'utf-8');
         if(!/\.(ashx)$/.test(src))
             buf = buf.replace(/utf\-?8/gi,encoding);
         buf = iconv.encode(buf,encoding);
@@ -98,7 +98,7 @@ function del(path){
 var getConfigCont = function(){
     var content;
     return function(){
-        return content || (content = fs.readFileSync('makefile.config','utf8'))
+        return content || (content = fs.readFileSync('makefile.config','utf-8'))
     }
 }();
 
@@ -158,11 +158,11 @@ function addtheme(){
 
 function mergeCss(){
     var content = [];
-    var csslist = fs.readFileSync('themes/default/_css/ueditor.css','utf8');
+    var csslist = fs.readFileSync('themes/default/_css/ueditor.css','utf-8');
     csslist = csslist.match(/\"([^\"]+)\"/g);
     for(var i= 0,ci;ci=csslist[i++];){
         console.log(ci.replace(/['"]/g,''));
-        content.push(fs.readFileSync('themes/default/_css/' + ci.replace(/['"]/g,''),'utf8'));
+        content.push(fs.readFileSync('themes/default/_css/' + ci.replace(/['"]/g,''),'utf-8'));
     }
     if(!fs.existsSync('themes/default/css')){
         fs.mkdirSync('themes/default/css',0755);
@@ -183,12 +183,12 @@ function mergeCss(){
 
 function mergeJs(){
 
-    var jslist = fs.readFileSync('_examples/editor_api.js','utf8');
+    var jslist = fs.readFileSync('_examples/editor_api.js','utf-8');
     jslist = jslist.match(/\[([^\]]+)\]/)[1].match(/'[^']+'/g);
     var content = [];
     for(var i= 0,ci;ci=jslist[i++];){
         console.log(ci.replace(/['"]/g,''));
-        content.push(fs.readFileSync('_src/' + ci.replace(/['"]/g,''),'utf8'));
+        content.push(fs.readFileSync('_src/' + ci.replace(/['"]/g,''),'utf-8'));
     }
     //前后封装
     content = '(function(){\n' + content.join('\n').replace('_css','css') + '})()';
@@ -234,7 +234,7 @@ function addDialogs(){
 
 }
 function addConfig(){
-    var content = fs.readFileSync('ueditor.config.js','utf8');
+    var content = fs.readFileSync('ueditor.config.js','utf-8');
     switch(severLang){
         case 'net':
             content = content.replace(/\.php/g,'.ashx').replace(/php\//g,'net\/');
@@ -242,7 +242,7 @@ function addConfig(){
         case 'jsp':
             content = content.replace(/\.php/g,'.jsp').replace(/php\//g,'jsp\/');
     }
-    if(encoding != 'utf8'){
+    if(encoding != 'utf-8'){
         content = content.replace(/utf\-?8/gi,encoding);
     }
     fs.writeFileSync('ueditor/ueditor.config.js',iconv.encode(content,encoding));
