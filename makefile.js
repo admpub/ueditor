@@ -31,20 +31,17 @@ function copy(src,dst,excludeFn){
                 copy(tsrc,tdst)
             }else{
                 writeFile(tdst,tsrc,encoding)
-                //fs.writeFileSync(tdst,fs.readFileSync(tsrc))
             }
         })
     }else{
         writeFile(dst,src,encoding)
-//        fs.writeFileSync(dst,fs.readFileSync(src))
     }
 
 }
 function move(src,dst){
 
     if(!fs.statSync(src).isDirectory()){
-        writeFile(dst,src,encoding)
-        //fs.writeFileSync(dst,fs.readFileSync(src));
+        writeFile(dst,src,encoding);
         fs.unlinkSync(src);
     }else{
         var dstlist = dst.split('/'),tmpPath = '';
