@@ -4,14 +4,20 @@ var fs = require('fs'),
     encoding = '',
     iconv = require('iconv-lite');
 
+function writeFile(dst,src){
+    var buf;
+    if(encoding != 'utf8' && /\.(jsp|ashx|php|html|js|css|config|java|cs)$/.test(src)){
+        buf = fs.readFileSync(src,'utf8');
+        buf = buf.replace(/utf\-?8/gi,encoding);
+        buf = iconv.encode(buf,encoding);
 
-function writeFile(tar,src,encode){
-
-    fs.writeFileSync(tar,encode ? iconv.encode(fs.readFileSync(src),encode) : fs.readFileSync(src))
+    }else{
+        buf = fs.readFileSync(src);
+    }
+    fs.writeFileSync(dst, buf);
 }
+
 function copy(src,dst,excludeFn){
-
-
     if(fs.statSync(src).isDirectory()){
 
         var dstlist = dst.split('/'),tmpPath = '';
@@ -30,18 +36,18 @@ function copy(src,dst,excludeFn){
             if(fs.statSync(tsrc).isDirectory()){
                 copy(tsrc,tdst)
             }else{
-                writeFile(tdst,tsrc,encoding)
+                writeFile(tdst,tsrc)
             }
         })
     }else{
-        writeFile(dst,src,encoding)
+        writeFile(dst,src)
     }
 
 }
 function move(src,dst){
-
     if(!fs.statSync(src).isDirectory()){
-        writeFile(dst,src,encoding);
+        writeFile(dst,src);
+
         fs.unlinkSync(src);
     }else{
         var dstlist = dst.split('/'),tmpPath = '';
@@ -62,8 +68,7 @@ function move(src,dst){
                 if(fs.statSync(tsrc).isDirectory()){
                     move(tsrc,tdst)
                 }else{
-                    writeFile(tdst,tsrc,encoding)
-//                    fs.writeFileSync(tdst,fs.readFileSync(tsrc))
+                    writeFile(tdst,tsrc);
                     fs.unlinkSync(tsrc);
                 }
             }
@@ -104,7 +109,8 @@ createDeployDir();
 getEncoding();
 ////添加后台语言
 addServerLang();
-
+////添加dialog
+addDialogs();
 ////合并css
 mergeCss();
 ////添加样式
@@ -113,8 +119,7 @@ addtheme();
 addFrontLang();
 ////合并js
 mergeJs();
-////添加dialog
-addDialogs();
+
 ////添加config.js
 addConfig();
 ////添加parse.js
@@ -161,7 +166,7 @@ function mergeCss(){
     if(!fs.existsSync('themes/default/css')){
         fs.mkdirSync('themes/default/css',0755);
     }
-    fs.writeFileSync('themes/default/css/ueditor.css',iconv.encode(content.join('\n'),encoding||'utf8'));
+    fs.writeFileSync('themes/default/css/ueditor.css',content.join('\n'));
     console.log('ueditor.css merge success');
     new compressor.minify({
         type: 'sqwish',
@@ -190,9 +195,9 @@ function mergeJs(){
         var jsp = require('uglify-js').parser,
             pro = require('uglify-js').uglify;
         var ast = jsp.parse(content);
-        fs.writeFileSync('ueditor.all.js',iconv.encode(pro.gen_code(ast,{beautify:true}),encoding));
+        fs.writeFileSync('ueditor.all.js',pro.gen_code(ast,{beautify:true}));
     }catch(e){
-        fs.writeFileSync('ueditor.all.js',iconv.encode(content,encoding));
+        fs.writeFileSync('ueditor.all.js',content);
     }
 
     console.log('ueditor.all.js create success');
@@ -224,7 +229,8 @@ function mergeJs(){
 }
 
 function addDialogs(){
-    copy('dialogs','ueditor/dialogs')
+    copy('dialogs','ueditor/dialogs');
+
 }
 function addConfig(){
     var content = fs.readFileSync('ueditor.config.js','utf8');
@@ -234,6 +240,9 @@ function addConfig(){
             break;
         case 'jsp':
             content = content.replace(/\.php/g,'.jsp').replace(/php\//g,'jsp\/');
+    }
+    if(encoding != 'utf8'){
+        content = content.replace(/utf\-?8/gi,encoding);
     }
     fs.writeFileSync('ueditor/ueditor.config.js',iconv.encode(content,encoding));
 
