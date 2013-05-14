@@ -8,7 +8,8 @@ function writeFile(dst,src){
     var buf;
     if(encoding != 'utf8' && /\.(jsp|ashx|php|html|js|css|config|java|cs)$/.test(src)){
         buf = fs.readFileSync(src,'utf8');
-        buf = buf.replace(/utf\-?8/gi,encoding);
+        if(!/\.(ashx)$/.test(src))
+            buf = buf.replace(/utf\-?8/gi,encoding);
         buf = iconv.encode(buf,encoding);
 
     }else{
