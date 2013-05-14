@@ -6,11 +6,13 @@ var fs = require('fs'),
 
 function writeFile(dst,src){
     var buf;
-    if(encoding != 'utf-8' && /\.(jsp|ashx|php|html|js|css|config|java|cs)$/.test(src)){
+    if(encoding != 'utf-8' && /\.(jsp|ashx|php|html|js|css|java|cs)$/.test(src)){
+
         buf = fs.readFileSync(src,'utf-8');
         if(!/\.(ashx)$/.test(src))
             buf = buf.replace(/utf\-?8/gi,encoding);
-        buf = iconv.encode(buf,encoding);
+        if(!/\.config/.test(src))
+            buf = iconv.encode(buf,encoding);
 
     }else{
         buf = fs.readFileSync(src);
