@@ -1,10 +1,14 @@
 var fs = require('fs'),
     compressor = require('node-minify'),
     severLang = '',
-    encoding = '';
+    encoding = '',
+    iconv = require('iconv-lite');
 
 
+function writeFile(tar,src,encode){
 
+    fs.writeFileSync(tar,encode ? iconv.encode(fs.readFileSync(src),encode) : fs.readFileSync(src))
+}
 function copy(src,dst,excludeFn){
 
 
@@ -26,19 +30,21 @@ function copy(src,dst,excludeFn){
             if(fs.statSync(tsrc).isDirectory()){
                 copy(tsrc,tdst)
             }else{
-                fs.writeFileSync(tdst,fs.readFileSync(tsrc))
+                writeFile(tdst,tsrc,encoding)
+                //fs.writeFileSync(tdst,fs.readFileSync(tsrc))
             }
         })
     }else{
-        fs.writeFileSync(dst,fs.readFileSync(src))
+        writeFile(dst,src,encoding)
+//        fs.writeFileSync(dst,fs.readFileSync(src))
     }
 
 }
 function move(src,dst){
 
     if(!fs.statSync(src).isDirectory()){
-
-        fs.writeFileSync(dst,fs.readFileSync(src));
+        writeFile(dst,src,encoding)
+        //fs.writeFileSync(dst,fs.readFileSync(src));
         fs.unlinkSync(src);
     }else{
         var dstlist = dst.split('/'),tmpPath = '';
@@ -59,7 +65,8 @@ function move(src,dst){
                 if(fs.statSync(tsrc).isDirectory()){
                     move(tsrc,tdst)
                 }else{
-                    fs.writeFileSync(tdst,fs.readFileSync(tsrc))
+                    writeFile(tdst,tsrc,encoding)
+//                    fs.writeFileSync(tdst,fs.readFileSync(tsrc))
                     fs.unlinkSync(tsrc);
                 }
             }
@@ -96,8 +103,11 @@ var getConfigCont = function(){
 /**********main********/
 ////创建部署目录
 createDeployDir();
+//得到输入编码
+getEncoding();
 ////添加后台语言
 addServerLang();
+
 ////合并css
 mergeCss();
 ////添加样式
@@ -122,6 +132,10 @@ function createDeployDir(){
         fs.mkdirSync('ueditor',0755);
 }
 
+function getEncoding(){
+    var content = getConfigCont();
+    encoding = content.match(/encoding\s*=\s*([^#\n\r\t]+)/)[1].replace(/\s*/g,'');
+}
 function addServerLang(){
     var content = getConfigCont();
     severLang = content.match(/server\.lang\s*=\s*([^#\n\r\t]+)/)[1].replace(/\s*/g,'');
@@ -150,7 +164,7 @@ function mergeCss(){
     if(!fs.existsSync('themes/default/css')){
         fs.mkdirSync('themes/default/css',0755);
     }
-    fs.writeFileSync('themes/default/css/ueditor.css',content.join('\n'));
+    fs.writeFileSync('themes/default/css/ueditor.css',iconv.encode(content.join('\n'),encoding||'utf8'));
     console.log('ueditor.css merge success');
     new compressor.minify({
         type: 'sqwish',
@@ -158,6 +172,7 @@ function mergeCss(){
         fileOut: 'themes/default/css/ueditor.min.css',
         callback: function(err){
             console.log('ueditor.min.css compress success');
+
         }
     });
 
@@ -178,9 +193,9 @@ function mergeJs(){
         var jsp = require('uglify-js').parser,
             pro = require('uglify-js').uglify;
         var ast = jsp.parse(content);
-        fs.writeFileSync('ueditor.all.js',pro.gen_code(ast,{beautify:true}));
+        fs.writeFileSync('ueditor.all.js',iconv.encode(pro.gen_code(ast,{beautify:true}),encoding));
     }catch(e){
-        fs.writeFileSync('ueditor.all.js',content);
+        fs.writeFileSync('ueditor.all.js',iconv.encode(content,encoding));
     }
 
     console.log('ueditor.all.js create success');
@@ -223,7 +238,7 @@ function addConfig(){
         case 'jsp':
             content = content.replace(/\.php/g,'.jsp').replace(/php\//g,'jsp\/');
     }
-    fs.writeFileSync('ueditor/ueditor.config.js',content);
+    fs.writeFileSync('ueditor/ueditor.config.js',iconv.encode(content,encoding));
 
 }
 function addParse(){
