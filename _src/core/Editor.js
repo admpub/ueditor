@@ -329,24 +329,26 @@
             me.isReady = 1;
             me.fireEvent('ready');
             options.onready && options.onready.call(me);
-            if (!browser.ie) {
-                domUtils.on(me.window, ['blur', 'focus'], function (e) {
-                    //chrome下会出现alt+tab切换时，导致选区位置不对
-                    if (e.type == 'blur') {
-                        me._bakRange = me.selection.getRange();
-                        try {
-                            me.selection.getNative().removeAllRanges();
-                        } catch (e) {
-                        }
-
-                    } else {
-                        try {
-                            me._bakRange && me._bakRange.select();
-                        } catch (e) {
-                        }
-                    }
-                });
-            }
+            //新版本的chrome没有这个问题，而且在firefox下会以下问题
+            //http://www.ueditorbbs.com/forum.php?mod=viewthread&tid=21859&extra=page%3D1
+//            if (!browser.ie) {
+//                domUtils.on(me.window, ['blur', 'focus'], function (e) {
+//                    //chrome下会出现alt+tab切换时，导致选区位置不对
+//                    if (e.type == 'blur') {
+//                        me._bakRange = me.selection.getRange();
+//                        try {
+//                            me.selection.getNative().removeAllRanges();
+//                        } catch (e) {
+//                        }
+//
+//                    } else {
+//                        try {
+//                            me._bakRange && me._bakRange.select();
+//                        } catch (e) {
+//                        }
+//                    }
+//                });
+//            }
             //trace:1518 ff3.6body不够寛，会导致点击空白处无法获得焦点
             if (browser.gecko && browser.version <= 10902) {
                 //修复ff3.6初始化进来，不能点击获得焦点
