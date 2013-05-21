@@ -680,7 +680,7 @@ test('adaptbytext，adaptbywindow', function () {
     editor.execCommand('adaptbytext');//parseInt
     stop();
     setTimeout(function(){
-        equal(editor.body.firstChild.width,'','按内容自适应')
+        equal(editor.body.firstChild.width,'','按内容自适应');
         editor.execCommand('adaptbywindow');
         setTimeout(function(){
             ok((parseInt(editor.body.firstChild.width)-editor.body.offsetWidth/2)>0,'默认按窗口计算宽度');
@@ -884,4 +884,25 @@ test('trace 713：合并最后一列单元格后再前插入列', function () {
         }, 50);
     }, 50);
     stop();
+});
+
+test('trace 3376：文本自适应后双击表格边缘线', function () {
+    var editor = te.obj[0];
+    var range = te.obj[1];
+    editor.setContent('<p></p>');
+    range.setStart(editor.body.firstChild, 0).collapse(true).select();
+    editor.execCommand('inserttable', {numCols:2, numRows:2});
+    range.setStart(editor.body.getElementsByTagName('td')[0], 0).collapse(true).select();
+    ok((parseInt(editor.body.firstChild.width)-editor.body.offsetWidth/2)>0,'默认按窗口计算宽度');
+    editor.execCommand('adaptbytext');
+    stop();
+    setTimeout(function(){
+        equal(editor.body.firstChild.width,'','文本自适应');
+        var tds = te.obj[0].body.getElementsByTagName('td');
+        ua.dblclick(tds[0],{clientX:199,clientY:100});
+        setTimeout(function(){
+//            equal(editor.body.firstChild.width,'','文本自适应,取不到宽度值');//TODO bug
+            start();
+        },20);
+    },20);
 });

@@ -10,6 +10,7 @@ test( 'font转span', function() {
     html = '<strong><span style="font-size:10px;color:#ff0000;font-family:楷体">hello</span></strong>';
     ua.checkHTMLSameStyle(html,editor.document,editor.body.firstChild,'转换font标签');
 } );
+
 test( 'beforegetContent', function() {
     var editor = te.obj[0];
     var range = te.obj[1];
@@ -29,8 +30,8 @@ test( 'beforegetContent', function() {
     },50);
 } );
 
-/*为超链接添加删除线，超链接仍然有删除线，trace946*/
-test( 'underline and linethrough', function() {
+/*为超链接添加删除线，超链接仍然有删除线*/
+test( 'trace 946：underline and linethrough', function() {
     var editor = te.obj[2];
     var div = document.body.appendChild( document.createElement( 'div' ) );
     $( div ).css( 'width', '500px' ).css( 'height', '500px' ).css( 'border', '1px solid #ccc' );
@@ -60,8 +61,8 @@ test( 'underline and linethrough', function() {
     },50);
 } );
 
-/*为不同字号的文本加背景色，trace981*/
-test( 'background--不同字号', function() {
+/*为不同字号的文本加背景色*/
+test( 'trace 981：background--不同字号', function() {
     if(!ua.browser.opera){
         var editor = te.obj[2];
         var div = document.body.appendChild( document.createElement( 'div' ) );
@@ -114,7 +115,6 @@ test( 'trace 937：为第一个有样式的字加删除线', function() {
     },50);
 } );
 
-/*trace 918*/
 test( 'trace 918：字体的状态反射', function() {
     var editor = te.obj[2];
     var div = document.body.appendChild( document.createElement( 'div' ) );
@@ -250,35 +250,32 @@ test( 'trace 819, 765：删除线和下划线互斥', function() {
     },50);
 } );
 
-///*trace 810*/
-//TODO 1.2.6
-//test( 'trace 810：闭合时设置删除线会改变文本前景色', function() {
-//    if(!ua.browser.opera){
-//        var editor = te.obj[2];
-//        var div = document.body.appendChild( document.createElement( 'div' ) );
-//        $( div ).css( 'width', '500px' ).css( 'height', '500px' ).css( 'border', '1px solid #ccc' );
-//        editor.render(div);
-//        var range = new baidu.editor.dom.Range( editor.document );
-//        stop();
-//        setTimeout(function(){
-//            editor.setContent( '<p><span style="color: rgb(153, 230, 0); ">你好<span style="color: rgb(255, 0, 0); ">​hello</span></span></p>' );
-//            range.setStart( editor.body.firstChild.firstChild.lastChild, 1 ).collapse( true ).select();
-//            editor.execCommand( 'strikethrough' );
-//            range = editor.selection.getRange();
-//            range.insertNode( editor.document.createTextNode( 'hey' ) );
-//            /*ff下会自动加一个空的设置了style的span，比较时不作考虑*/
-//            if ( baidu.editor.dom.domUtils.isEmptyNode( editor.body.firstChild.lastChild ) && baidu.editor.browser.gecko )
-//                editor.body.firstChild.removeChild( editor.body.firstChild.lastChild );
-//            var html = '<span style="color: rgb(153, 230, 0)">你好<span style="color: rgb(255, 0, 0)">hello<span style="color: rgb(255, 0, 0); text-decoration: line-through;">hey</span></span></span>';
-//            ua.checkHTMLSameStyle( html, editor.document, editor.body.firstChild, '检查插入的删除线前景色是否正确' );
-//            equal(editor.body.firstChild.innerHTML,html);
-//            div.parentNode.removeChild(div);
-//            start();
-//        },50);
-//    }
-//} );
+test( 'trace 810：闭合时设置删除线会改变文本前景色', function() {
+    if(!ua.browser.opera){
+        var editor = te.obj[2];
+        var div = document.body.appendChild( document.createElement( 'div' ) );
+        $( div ).css( 'width', '500px' ).css( 'height', '500px' ).css( 'border', '1px solid #ccc' );
+        editor.render(div);
+        var range = new baidu.editor.dom.Range( editor.document );
+        stop();
+        setTimeout(function(){
+            editor.setContent( '<p><span style="color: rgb(153, 230, 0); ">你好<span style="color: rgb(255, 0, 0); ">​hello</span></span></p>' );
+            range.setStart( editor.body.firstChild.firstChild.lastChild, 1 ).collapse( true ).select();
+            editor.execCommand( 'strikethrough' );
+            range = editor.selection.getRange();
+            range.insertNode( editor.document.createTextNode( 'hey' ) );
+            /*ff下会自动加一个空的设置了style的span，比较时不作考虑*/
+            if ( baidu.editor.dom.domUtils.isEmptyNode( editor.body.firstChild.lastChild ) && baidu.editor.browser.gecko )
+                editor.body.firstChild.removeChild( editor.body.firstChild.lastChild );
+            var html = '<span style="color: rgb(153, 230, 0)">你好<span style="color: rgb(255, 0, 0)">hello<span style="color: rgb(255, 0, 0); text-decoration: line-through;">hey</span></span></span>';
+            ua.checkHTMLSameStyle( html, editor.document, editor.body.firstChild, '检查插入的删除线前景色是否正确' );
+            equal(html,editor.body.firstChild.innerHTML);
+            div.parentNode.removeChild(div);
+            start();
+        },50);
+    }
+} );
 
-/*trace 809*/
 test( 'trace 809：闭合时改变前景色和删除线，再输入文本', function() {
     if(!ua.browser.opera){
         var editor = te.obj[2];
@@ -311,7 +308,6 @@ test( 'trace 809：闭合时改变前景色和删除线，再输入文本', func
     }
 } );
 
-/*trace 805*/
 test( 'trace 805：切换删除线和下划线，前景色没了', function() {
     var editor = te.obj[2];
     var div = document.body.appendChild( document.createElement( 'div' ) );
@@ -566,6 +562,16 @@ test( 'trace 3096：单元格中改变字号', function() {
     equal(editor.body.firstChild.getElementsByTagName('td')[0].style.height,'','不固定高度');
 });
 
+//TODO bug
+//test( 'trace 3352：同一个p中添加边框', function() {
+//    var editor = te.obj[0];
+//    var range = te.obj[1];
+//    editor.setContent( '<p>as<strong>dfsadfsa</strong><em>dfsd</em>fsdf</p>' );
+//    range.setStart(editor.body.firstChild.firstChild,0).setEnd(editor.body.firstChild.lastChild,4).select();
+//    editor.execCommand( 'fontborder' );
+//    equal(ua.getChildHTML(editor.body.firstChild),'<p><span style="border: 1px solid rgb(0, 0, 0);">as<strong>dfsadfsa</strong><em>dfsd</em>fsdf</span></p>','查看添加了字符边框后的样式');
+//} );
+
 test( '转换font标签', function () {
     var editor = te.obj[0];
     editor.setContent( '<font size="16" color="red"><b><i>x</i></b></font>' );
@@ -575,5 +581,3 @@ test( '转换font标签', function () {
     html = '<span style="color:red"><span style="text-decoration:underline;">x</span></span>';
     ua.checkHTMLSameStyle(html,editor.document,editor.body.firstChild,'转换font标签');
 } );
-
-

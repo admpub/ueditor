@@ -28,7 +28,7 @@ test( '删span中的white-space标签', function () {
     }
 } );
 //TODO 1.2.6
-//test( '删p中的margin|padding标签', function () {
+//test( 'trace 3362：删p中的margin|padding标签', function () {
 //    var editor = te.obj[0];
 //    editor.setContent( '<p style="margin-left: 1em; list-style: none;" >hello</p>' );
 //    var html = '<p style="list-style: none;">hello</p>';

@@ -93,3 +93,16 @@ test('全部替换内容为空',function(){
     ua.manualDeleteFillData(editor.body);
     equal(editor.body.firstChild.innerHTML,'回来 啊');
 });
+
+//TODO bug
+//test('trace 3405：向上替换',function(){
+//    if(ua.browser.opera)return;
+//    var editor = te.obj[0];
+//    var range = te.obj[1];
+//    editor.setContent('<p>欢迎回来 欢迎啊</p>');
+//    range.setStart(editor.body.firstChild.firstChild,8).collapse(true).select();
+//    editor.execCommand('searchreplace',{searchStr:'欢迎',replaceStr:'啊'});
+//    editor.execCommand('searchreplace',{searchStr:'欢迎',replaceStr:'啊'});
+//    ua.manualDeleteFillData(editor.body);
+//    equal(editor.body.firstChild.innerHTML,'啊回来 欢迎啊');
+//});
