@@ -250,31 +250,31 @@ test( 'trace 819, 765：删除线和下划线互斥', function() {
     },50);
 } );
 
-test( 'trace 810：闭合时设置删除线会改变文本前景色', function() {
-    if(!ua.browser.opera){
-        var editor = te.obj[2];
-        var div = document.body.appendChild( document.createElement( 'div' ) );
-        $( div ).css( 'width', '500px' ).css( 'height', '500px' ).css( 'border', '1px solid #ccc' );
-        editor.render(div);
-        var range = new baidu.editor.dom.Range( editor.document );
-        stop();
-        setTimeout(function(){
-            editor.setContent( '<p><span style="color: rgb(153, 230, 0); ">你好<span style="color: rgb(255, 0, 0); ">​hello</span></span></p>' );
-            range.setStart( editor.body.firstChild.firstChild.lastChild, 1 ).collapse( true ).select();
-            editor.execCommand( 'strikethrough' );
-            range = editor.selection.getRange();
-            range.insertNode( editor.document.createTextNode( 'hey' ) );
-            /*ff下会自动加一个空的设置了style的span，比较时不作考虑*/
-            if ( baidu.editor.dom.domUtils.isEmptyNode( editor.body.firstChild.lastChild ) && baidu.editor.browser.gecko )
-                editor.body.firstChild.removeChild( editor.body.firstChild.lastChild );
-            var html = '<span style="color: rgb(153, 230, 0)">你好<span style="color: rgb(255, 0, 0)">hello<span style="color: rgb(255, 0, 0); text-decoration: line-through;">hey</span></span></span>';
-            ua.checkHTMLSameStyle( html, editor.document, editor.body.firstChild, '检查插入的删除线前景色是否正确' );
-            equal(html,editor.body.firstChild.innerHTML);
-            div.parentNode.removeChild(div);
-            start();
-        },50);
-    }
-} );
+//test( 'trace 810：闭合时设置删除线会改变文本前景色', function() {
+//    if(!ua.browser.opera){
+//        var editor = te.obj[2];
+//        var div = document.body.appendChild( document.createElement( 'div' ) );
+//        $( div ).css( 'width', '500px' ).css( 'height', '500px' ).css( 'border', '1px solid #ccc' );
+//        editor.render(div);
+//        var range = new baidu.editor.dom.Range( editor.document );
+//        stop();
+//        setTimeout(function(){
+//            editor.setContent( '<p><span style="color: rgb(153, 230, 0); ">你好<span style="color: rgb(255, 0, 0); ">​hello</span></span></p>' );
+//            range.setStart( editor.body.firstChild.firstChild.lastChild, 1 ).collapse( true ).select();
+//            editor.execCommand( 'strikethrough' );
+//            range = editor.selection.getRange();
+//            range.insertNode( editor.document.createTextNode( 'hey' ) );
+//            /*ff下会自动加一个空的设置了style的span，比较时不作考虑*/
+//            if ( baidu.editor.dom.domUtils.isEmptyNode( editor.body.firstChild.lastChild ) && baidu.editor.browser.gecko )
+//                editor.body.firstChild.removeChild( editor.body.firstChild.lastChild );
+//            var html = '<span style="color: rgb(153, 230, 0)">你好<span style="color: rgb(255, 0, 0)">hello<span style="color: rgb(255, 0, 0); text-decoration: line-through;">hey</span></span></span>';
+//            ua.checkHTMLSameStyle( html, editor.document, editor.body.firstChild, '检查插入的删除线前景色是否正确' );
+//            equal(html,editor.body.firstChild.innerHTML);
+//            div.parentNode.removeChild(div);
+//            start();
+//        },50);
+//    }
+//} );
 
 test( 'trace 809：闭合时改变前景色和删除线，再输入文本', function() {
     if(!ua.browser.opera){
