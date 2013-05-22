@@ -28,7 +28,7 @@ UE.plugins['searchreplace'] = function(){
                     casesensitive : false,
                     dir : 1
                 },true);
-
+            var searchStr = opt.searchStr;
             if(browser.ie){
                 me.focus();
                 while(1){
@@ -122,8 +122,26 @@ UE.plugins['searchreplace'] = function(){
                     }else{
                         nativeSel.removeAllRanges();
                     }
+                    //是正则查找
 
-                    if(!w.find(opt.searchStr,opt.casesensitive,opt.dir < 0 ? true : false) ) {
+                    if(/^\/[^/]+\/$/.test(opt.searchStr)){
+                        //向前查找
+                        if(opt.dir < 0 ){
+                            nativeRange.collapse(true);
+                            nativeRange.setStart(me.body,0);
+                        }else{
+                            nativeRange.setEnd(me.body,me.body.childNodes.length);
+                        }
+                        var str = nativeRange + '',
+                            reg = new RegExp(opt.searchStr.replace(/^\/|\/$/g,''));
+                        var match = reg.exec(str);
+                        if(match && match[0]){
+                            searchStr = match[0];
+                        }else{
+                            return num;
+                        }
+                    }
+                    if(!w.find(searchStr,opt.casesensitive,opt.dir < 0 ? true : false) ) {
                         currentRange = null;
                         nativeSel.removeAllRanges();
                         return num;
