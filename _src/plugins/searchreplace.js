@@ -54,9 +54,17 @@ UE.plugins['searchreplace'] = function(){
                     }
                     nativeRange = tmpRange.duplicate();
 
-
-
-                    if(!tmpRange.findText(opt.searchStr,opt.dir,opt.casesensitive ? 4 : 0)){
+                    if(/^\/[^/]+\/$/.test(opt.searchStr)){
+                        var str = tmpRange.text,
+                            reg = new RegExp(opt.searchStr.replace(/^\/|\/$/g,''));
+                        var match = reg.exec(str);
+                        if(match && match[0]){
+                            searchStr = match[0];
+                        }else{
+                            return num;
+                        }
+                    }
+                    if(!tmpRange.findText(searchStr,opt.dir,opt.casesensitive ? 4 : 0)){
                         currentRange = null;
                         tmpRange = me.document.selection.createRange();
                         tmpRange.scrollIntoView();
