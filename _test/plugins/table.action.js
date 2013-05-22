@@ -267,7 +267,7 @@ test('trace 3059 表格右浮动',function(){
     },50);
 });
 
-test('trace 3378：拖拽后tab，不影响表格样式',function(){
+test('trace 3378 拖拽后tab，不影响表格样式',function(){
     if (browser.ie && browser.version < 8) return;
     var editor = te.obj[0];
     var range = te.obj[1];
@@ -294,8 +294,7 @@ test('trace 3378：拖拽后tab，不影响表格样式',function(){
     stop();
 });
 
-//超时，暂时注掉
-test('表格粘贴',function(){
+test('trace 3358 表格粘贴',function(){
     var div = document.body.appendChild(document.createElement('div'));
     var editor = te.obj[0];
     var range = te.obj[1];
@@ -314,40 +313,40 @@ test('表格粘贴',function(){
     editor.fireEvent("afterpaste");
     equal(editor.body.getElementsByTagName('table').length,'2','触发粘贴事件后有2个table');
 });
-//
-//test('trace 3104 粘贴后合并单元格',function(){
-//    var div = document.body.appendChild(document.createElement('div'));
-//    var editor = te.obj[0];
-//    var range = te.obj[1];
-//    editor.setContent('');
-//    editor.execCommand('inserttable');
-//    var trs = editor.body.getElementsByTagName('tr');
-//    var ut = editor.getUETable(editor.body.firstChild);
-//    var cellsRange = ut.getCellsRange(trs[0].cells[0],trs[4].cells[0]);
-//    ut.setSelected(cellsRange);
-//    range.setStart( trs[0].cells[0], 0 ).collapse( true ).select();
-//    ua.keydown(editor.body,{'keyCode':67,'ctrlKey':true});
-//    ut.clearSelected();
-//    var html ={html:editor.body.innerHTML};
-//    range.setStart(editor.body.lastChild,0).collapse(true).select();
-//    editor.fireEvent('beforepaste',html);
-//    editor.fireEvent("afterpaste");
-//    var table = editor.body.getElementsByTagName('table');
-//    equal(table.length,'2','触发粘贴事件后有2个table');
-//    equal(table[1].firstChild.childNodes.length,'5','5行');
-//    equal(table[1].firstChild.firstChild.childNodes.length,'1','1列');
-//
-//    var tds = editor.body.getElementsByTagName('td');
-//    ut = editor.getUETable(editor.body.firstChild.nextSibling);
-//    cellsRange = ut.getCellsRange(tds[25],tds[29]);
-//    ut.setSelected(cellsRange);
-//    range.setStart(tds[25], 0 ).collapse( true ).select();
-//    editor.execCommand('mergecells');
-//    table = editor.body.getElementsByTagName('table');
-//    equal(table[1].firstChild.childNodes.length,'1','1行');
-//    equal(table[1].firstChild.firstChild.childNodes.length,'1','1列');
-//});
-//
+
+test('trace 3104 粘贴后合并单元格',function(){
+    var div = document.body.appendChild(document.createElement('div'));
+    var editor = te.obj[0];
+    var range = te.obj[1];
+    editor.setContent('');
+    editor.execCommand('inserttable');
+    var trs = editor.body.getElementsByTagName('tr');
+    var ut = editor.getUETable(editor.body.firstChild);
+    var cellsRange = ut.getCellsRange(trs[0].cells[0],trs[4].cells[0]);
+    ut.setSelected(cellsRange);
+    range.setStart( trs[0].cells[0], 0 ).collapse( true ).select();
+    ua.keydown(editor.body,{'keyCode':67,'ctrlKey':true});
+    ut.clearSelected();
+    var html ={html:editor.body.innerHTML};
+    range.setStart(editor.body.lastChild,0).collapse(true).select();
+    editor.fireEvent('beforepaste',html);
+    editor.fireEvent("afterpaste");
+    var table = editor.body.getElementsByTagName('table');
+    equal(table.length,'2','触发粘贴事件后有2个table');
+    equal(table[1].firstChild.childNodes.length,'5','5行');
+    equal(table[1].firstChild.firstChild.childNodes.length,'1','1列');
+
+    var tds = editor.body.getElementsByTagName('td');
+    ut = editor.getUETable(editor.body.firstChild.nextSibling);
+    cellsRange = ut.getCellsRange(tds[25],tds[29]);
+    ut.setSelected(cellsRange);
+    range.setStart(tds[25], 0 ).collapse( true ).select();
+    editor.execCommand('mergecells');
+    table = editor.body.getElementsByTagName('table');
+    equal(table[1].firstChild.childNodes.length,'1','1行');
+    equal(table[1].firstChild.firstChild.childNodes.length,'1','1列');
+});
+
 test('trace 3105 在表格名称中粘贴',function(){
     var div = document.body.appendChild(document.createElement('div'));
     var editor = te.obj[0];

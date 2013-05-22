@@ -75,10 +75,9 @@ test( '不闭合插入上下标', function () {
     }, 100 );
 } );
 
-/*trace 870*/
 //无法模拟光标自动移到的场景，因此模拟输入文本通过插入文本节点实现的方法，在插入文本后光标仍然在原来的位置
 // 我们不确定光标实际在哪
-test( 'trace 870:加粗文本前面去加粗', function () {
+test( 'trace 870：加粗文本前面去加粗', function () {
     var editor = te.obj[0];
     var body = editor.body;
     var range = te.obj[1];
@@ -99,8 +98,7 @@ test( 'trace 870:加粗文本前面去加粗', function () {
         equal( editor.getContent(), '<p>hello2<strong>hello</strong><br/></p>' );
 } );
 
-/*trace 1043*/
-test( 'bold-在已加粗文本中间去除加粗', function () {
+test( 'trace 1043：bold-在已加粗文本中间去除加粗', function () {
     var editor = te.obj[0];
     var body = editor.body;
     var range = te.obj[1];
@@ -114,18 +112,15 @@ test( 'bold-在已加粗文本中间去除加粗', function () {
     equal( ua.getChildHTML( body.firstChild ), "aa<strong>hello</strong>ssss", "新文本节点没有加粗" );
 } );
 
-/*trace 958*/
-test( 'bold-在已加粗文本中间去除加粗', function () {
+test( 'trace 958：bold-在已加粗文本中间去除加粗', function () {
     var editor = te.obj[0];
     var body = editor.body;
-    var range = te.obj[1];
     editor.setContent( '' );
     editor.execCommand( 'bold' );
     ok( ua.getChildHTML( body ), "<stong></stong>", "editor不focus时点加粗，不会多一个空行" );
 } );
 
-/*trace 958*/
-test( 'bold-加粗状态反射', function () {
+test( 'trace 958：bold-加粗状态反射', function () {
     var editor = te.obj[0];
     var body = editor.body;
     var range = te.obj[1];
@@ -143,8 +138,7 @@ test( 'bold-加粗状态反射', function () {
     }, 100 )
 } );
 
-/*trace 580*/
-test( 'bold-连续加粗2次', function () {
+test( 'trace 580：bold-连续加粗2次', function () {
     var editor = te.obj[0];
     var body = editor.body;
     var range = te.obj[1];
@@ -161,12 +155,11 @@ test( 'bold-连续加粗2次', function () {
     equal( editor.queryCommandState( 'bold' ), 1, '加粗高亮' );
 } );
 
-/*trace 1983*/
-test( 'bold-2个单词，中间有空格第一个单词加粗，第二个单词加粗再去加粗', function () {
+test( 'trace 1983：bold-2个单词，中间有空格第一个单词加粗，第二个单词加粗再去加粗', function () {
     var editor = te.obj[0];
     var body = editor.body;
     var range = te.obj[1];
-    body.innerHTML =    '<p>hello world</p>';   //用setContent复现不了这个问题
+    body.innerHTML = '<p>hello world</p>';   //用setContent复现不了这个问题
     var text = body.firstChild.firstChild;
     range.setStart( text, 0 ).setEnd( text, 5 ).select();
     editor.execCommand( 'bold' );
@@ -190,7 +183,7 @@ test( '测试 userAction.manualdeleteFilldata', function () {
     equal( body.innerHTML.toLowerCase(), '<p>' + space + '</p>', '清除不可见字符后相等' );
 } );
 
-test( 'trace 1884:单击B再单击I ', function () {
+test( 'trace 1884：单击B再单击I ', function () {
     var editor = te.obj[0];
     var body = editor.body;
     var range = te.obj[1];
@@ -215,7 +208,7 @@ test( '单击B再在其他地方单击I，空的strong标签被删除 ', functio
     equal( editor.queryCommandState( 'italic' ), 1, 'b高亮' );
     ua.manualDeleteFillData( body );
     if(!ua.browser.ie){     //ie下有问题不能修，屏蔽ie
-            equal( body.innerHTML.toLowerCase(), '<p><em></em>hello</p>', '空strong标签被删除' )
+        equal( body.innerHTML.toLowerCase(), '<p><em></em>hello</p>', '空strong标签被删除' )
     }
 } );
 
@@ -274,8 +267,7 @@ test( 'ctrl+b', function() {
     stop();
 } );
 
-/*trace 3240*/
-test('表格中文本加粗',function(){
+test('trace 3240：表格中文本加粗',function(){
     var editor = te.obj[0];
     var range = te.obj[1];
     editor.setContent( '<p></p>' );
@@ -303,3 +295,13 @@ test('表格中文本加粗',function(){
     },50);
     stop();
 });
+
+test( 'trace 3387：文本最后是空格', function() {
+    var editor = te.obj[0];
+    editor.setContent( '<p>hello </p>' );
+    ua.keydown(editor.body,{'keyCode':65,'ctrlKey':true});
+    equal(editor.queryCommandState('bold'),0);
+    editor.execCommand('bold');
+    equal(editor.getContent(),'<p><strong>hello</strong></p>','查看样式');
+    equal(editor.queryCommandState('bold'),1);
+} );

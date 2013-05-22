@@ -13,6 +13,7 @@ test('闭合选择',function(){
     }, 50 );
     stop();
 });
+
 test('非闭合选择----字符串全选',function(){
     var editor=te.obj[0];
     var range=te.obj[1];
@@ -32,6 +33,7 @@ test('非闭合选择----字符串全选',function(){
     }, 50 );
     stop();
 });
+
 test('非闭合选择----子字符串',function(){
     var editor=te.obj[0];
     var range=te.obj[1];
@@ -47,6 +49,7 @@ test('非闭合选择----子字符串',function(){
     }, 50 );
     stop();
 });
+
 test('非闭合选择----字符串包括大写跟小写',function(){
     var editor=te.obj[0];
     var range=te.obj[1];
@@ -67,7 +70,8 @@ test('非闭合选择----字符串包括大写跟小写',function(){
     },50);
     stop();
 });
-test('非闭合选择----字符串包括换行跟空格',function(){
+
+test('trace 3402：非闭合选择----字符串包括换行跟空格',function(){
     if(ua.browser.ie == 9)return ;//TODO 1.2.6
     if(ua.browser.ie == 8)return ;//TODO 1.2.6 PUBLICGE-3402
     var editor=te.obj[0];
@@ -84,6 +88,7 @@ test('非闭合选择----字符串包括换行跟空格',function(){
     },50);
     stop();
 });
+
 test('标签table',function(){
     //单个单元格，多个单元格，两个表格
     var editor=te.obj[0];
@@ -182,5 +187,3 @@ test('三个组合',function(){
     ok(body.lastChild.tagName=="h1"||body.lastChild.tagName=="H1","h1标签");
     equal(body.lastChild.innerHTML,"hello","h1--low");
 });
-
-

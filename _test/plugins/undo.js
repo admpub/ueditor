@@ -454,3 +454,28 @@ test( 'trace 3209 插入表格,undo redo', function () {
     ua.manualDeleteFillData( editor.body );
     equal( editor.body.firstChild.tagName.toLowerCase(), 'table', '插入表格,撤销重做' );
 } );
+
+test('trace 3354：双击表格边缘线，undo',function(){
+    if(ua.browser.ie)return;//TODO 1.2.6
+    var editor = te.obj[0];
+    var range = te.obj[1];
+    editor.setContent( '<p></p>' );
+    range.setStart( editor.body.firstChild, 0 ).collapse( true ).select();
+    editor.execCommand( 'inserttable');
+    ua.manualDeleteFillData( editor.body );
+    var tds = te.obj[0].body.getElementsByTagName('td');
+    ua.dblclick(tds[0],{clientX:199,clientY:100});
+    stop();
+    setTimeout(function(){
+        tds = editor.body.firstChild.getElementsByTagName( 'td' );
+        ok(tds[0].width<10, '第一列宽度变小' );
+        range.setStart( tds[0], 0 ).collapse( true ).select();
+        editor.execCommand('undo');
+        tds = editor.body.firstChild.getElementsByTagName( 'td' );
+        ok(tds[0].width>20, '第一列宽度恢复' );
+        editor.execCommand('redo');
+        tds = editor.body.firstChild.getElementsByTagName( 'td' );
+        ok(tds[0].width<10, '第一列宽度恢复' );
+        start();
+    },50);
+});

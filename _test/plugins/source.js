@@ -315,4 +315,18 @@ test('在font,b,i标签中输入，会自动转换标签 ',function(){
     stop();
 //    }
 });
-
+//TODO bug
+//test( 'trace 3357：:带有空标签的列表切换源码', function () {
+//    var editor = te.obj[0];
+//    editor.setContent( '<ol><li></li><li><p>hello5</p></li><li><p></p><p></p></li></ol>' );
+//    setTimeout( function () {
+//        editor.execCommand( 'source' );
+//        setTimeout( function () {
+//            editor.execCommand( 'source' );
+//            var br = ua.browser.ie?'&nbsp;':'<br>';
+//            equal( editor.body.innerHTML.toLowerCase(),'<ol class=" list-paddingleft-2"><li><p>'+br+'</p></li><li><p>hello5</p></li><li><p>'+br+'</p><p>'+br+'</p></li></ol>');
+//            start();
+//        }, 20 );
+//    }, 20 );
+//    stop();
+//} );
