@@ -183,6 +183,20 @@
                 container = document.getElementById(container);
             }
             if (container) {
+                if(options.initialFrameWidth){
+                    options.minFrameWidth = options.initialFrameWidth
+                }else{
+                    options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
+                }
+                if(options.initialFrameHeight){
+                    options.minFrameHeight = options.initialFrameHeight
+                }else{
+                    options.initialFrameHeight = options.minFrameHeight = container.offsetHeight;
+                }
+                container.style.width = options.initialFrameWidth+ 'px';
+                container.style.height = options.initialFrameHeight + 'px';
+                container.style.zIndex = options.zIndex;
+
                 var useBodyAsViewport = ie && browser.version < 9,
                     html = ( ie && browser.version < 9 ? '' : '<!DOCTYPE html>') +
                         '<html xmlns=\'http://www.w3.org/1999/xhtml\'' + (!useBodyAsViewport ? ' class=\'view\'' : '') + '><head>' +
@@ -197,39 +211,15 @@
                         'p{margin:5px 0;}'
                         + ( options.initialStyle || '' ) +
                         '</style></head><body' + (useBodyAsViewport ? ' class=\'view\'' : '') + '></body>';
-                if (options.customDomain && document.domain != location.hostname) {
-                    html += '<script>window.parent.UE.instants[\'ueditorInstant' + me.uid + '\']._setup(document);</script></html>';
-                    container.appendChild(domUtils.createElement(document, 'iframe', {
-                        id: 'ueditor_' + me.uid,
-                        width: "100%",
-                        height: "100%",
-                        frameborder: "0",
-                        src: 'javascript:void(function(){document.open();document.domain="' + document.domain + '";' +
-                            'document.write("' + html + '");document.close();}())'
-                    }));
-                } else {
-
-                    if(options.initialFrameWidth){
-                        options.minFrameWidth = options.initialFrameWidth
-                    }else{
-                        options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
-                    }
-                    if(options.initialFrameHeight){
-                        options.minFrameHeight = options.initialFrameHeight
-                    }else{
-                        options.initialFrameHeight = options.minFrameHeight = container.offsetHeight;
-                    }
-                    container.style.width = options.initialFrameWidth+ 'px';
-                    container.style.height = options.initialFrameHeight + 'px';
-                    container.style.zIndex = options.zIndex;
-                    container.innerHTML = '<iframe id="' + 'ueditor_' + this.uid + '"' + 'width="100%" height="100%" scroll="no" frameborder="0" ></iframe>';
-                    var doc = container.firstChild.contentWindow.document;
-                    //去掉了原来的判断!browser.webkit，因为会导致onload注册的事件不触发
-                    doc.open();
-                    doc.write(html + '</html>');
-                    doc.close();
-                    me._setup(doc);
-                }
+                html += '<script>window.parent.UE.instants[\'ueditorInstant' + me.uid + '\']._setup(document);</script></html>';
+                container.appendChild(domUtils.createElement(document, 'iframe', {
+                    id: 'ueditor_' + me.uid,
+                    width: "100%",
+                    height: "100%",
+                    frameborder: "0",
+                    src: 'javascript:void(function(){document.open();' + (options.customDomain && document.domain != location.hostname ?  'document.domain="' + document.domain + '";' : '') +
+                        'document.write("' + html + '");document.close();}())'
+                }));
                 container.style.overflow = 'hidden';
             }
         },

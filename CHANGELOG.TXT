@@ -4,7 +4,9 @@ Version 1.2.7
     修复问题列表
     1.http://www.ueditorbbs.com/forum.php?mod=viewthread&tid=21859&extra=page%3D1
     2.http://www.ueditorbbs.com/forum.php?mod=viewthread&tid=21211&extra=page%3D2
-
+    3.http://www.ueditorbbs.com/forum.php?mod=viewthread&tid=17640&page=1#pid33601
+    新功能
+    1.查找替换支持正则表达式
 
 Version 1.2.6
     1.优化了编辑器路径的设置，可以不用手动设置路径，自动识别相关路径，解决路径设置繁琐的问题
@@ -18,7 +20,6 @@ Version 1.2.6
     9.改使用closure的压缩工具
     10.优化了undo/redo操作
     11.优化了ui界面
-
 
 Version 1.2.5
 新增功能
