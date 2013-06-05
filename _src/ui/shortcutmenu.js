@@ -3,14 +3,17 @@
         UIBase = UI.UIBase,
         uiUtils = UI.uiUtils,
         utils = baidu.editor.utils,
-        domUtils = baidu.editor.dom.domUtils,
+        domUtils = baidu.editor.dom.domUtils;
 
-        ShortCutMenu = UI.ShortCutMenu = function ( options ) {
-            this.initOptions ( options );
-            this.initShortCutMenu ();
-        };
+    var allMenus = [],//存储所有快捷菜单
+        isSubMenuShow = false,//是否有子pop显示
+        isPopClick = false;//是否是子pop点击
 
-    var allMenus = [];
+    var ShortCutMenu = UI.ShortCutMenu = function ( options ) {
+        this.initOptions ( options );
+        this.initShortCutMenu ();
+    };
+
     ShortCutMenu.postHide = hideAllMenu;
 
     ShortCutMenu.prototype = {
@@ -28,12 +31,15 @@
 
             domUtils.on ( doc , "mousemove" , function ( e ) {
                 if ( me.isHidden === false ) {
+                    //如果有pop显示，就不隐藏快捷菜单
+                    if ( me.getSubMenuMark () || isPopClick )   return;
+
                     var flag = true,
                         el = me.getDom (),
                         wt = el.offsetWidth,
                         ht = el.offsetHeight,
-                        distanceX = wt / 2 + 50,//距离中心X
-                        distanceY = ht / 2 + 50,//距离中心Y
+                        distanceX = wt / 2 + 50,//距离中心X标准
+                        distanceY = ht / 2 + 50,//距离中心Y标准
                         x = Math.abs ( e.screenX - me.left ),//离中心距离横坐标
                         y = Math.abs ( e.screenY - me.top );//离中心距离纵坐标
 
@@ -55,6 +61,21 @@
                     }
                 }
             } );
+
+            domUtils.on ( document , "mouseover" , function ( e ) {
+                var tgt = e.target || e.srcElement;
+                var src = tgt.getAttribute ( "data-src" );
+                if ( src == "shortcutmenu" ) {
+                    isPopClick = false;
+                }
+            } );
+
+            me.editor.addListener ( "afterhidepop" , function () {
+                if ( ! me.isHidden ) {
+                    isSubMenuShow = true;
+                    isPopClick = true;
+                }
+            } );
         } ,
         initItems : function () {
             for ( var i = 0, len = this.items.length ; i < len ; i ++ ) {
@@ -62,6 +83,7 @@
 
                 if ( UI[item] ) {
                     this.items[i] = new UI[item] ( this.editor );
+                    this.items[i].className += " edui-shortcutsubmenu ";
                 }
             }
         } ,
@@ -71,6 +93,20 @@
             } else {
                 el.style.opacity = value;
             }
+        } ,
+        getSubMenuMark : function () {
+            isSubMenuShow = false;
+            var layerEle = uiUtils.getFixedLayer ();
+            var list = domUtils.getElementsByTagName ( layerEle , "div" , function ( node ) {
+                return domUtils.hasClass ( node , "edui-shortcutsubmenu edui-popup" )
+            } );
+
+            for ( var i = 0, node ; node = list[i ++] ; ) {
+                if ( node.style.display != "none" ) {
+                    isSubMenuShow = true;
+                }
+            }
+            return isSubMenuShow;
         } ,
         show : function ( e ) {
             var el = this.getDom (), offset;
@@ -105,11 +141,12 @@
             for ( var i = 0 ; i < this.items.length ; i ++ ) {
                 buff[i] = this.items[i].renderHtml ();
             }
-            return '<div id="##" class="%% edui-toolbar" onselectstart="return false;" >' +
+            return '<div id="##" class="%% edui-toolbar" data-src="shortcutmenu" onselectstart="return false;" >' +
                 buff.join ( '' ) +
                 '</div>'
         }
     };
+
     utils.inherits ( ShortCutMenu , UIBase );
 
     function hideAllMenu ( e ) {

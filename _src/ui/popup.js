@@ -21,6 +21,8 @@
                 }
             }
         }
+
+        pop.editor.fireEvent("afterhidepop");
     }
 
     Popup.postHide = closeAllPopup;
