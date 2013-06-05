@@ -1,11 +1,11 @@
 (function () {
     var UI = baidu.editor.ui,
+        UIBase = UI.UIBase,
+        uiUtils = UI.uiUtils,
         utils = baidu.editor.utils,
-        UIBase = baidu.editor.ui.UIBase,
-        uiUtils = baidu.editor.ui.uiUtils,
         domUtils = baidu.editor.dom.domUtils,
 
-        ShortCutMenu = baidu.editor.ui.ShortCutMenu = function ( options ) {
+        ShortCutMenu = UI.ShortCutMenu = function ( options ) {
             this.initOptions ( options );
             this.initShortCutMenu ();
         };
