@@ -12,7 +12,6 @@
 
     var allPopups = [];
     function closeAllPopup( evt,el ){
-        var newAll = [];
         for ( var i = 0; i < allPopups.length; i++ ) {
             var pop = allPopups[i];
             if (!pop.isHidden()) {
@@ -156,7 +155,6 @@
         },
         hide: function (notNofity){
             if (!this._hidden && this.getDom()) {
-//                this.getDom().style.visibility = 'hidden';
                 this.getDom().style.display = 'none';
                 this._hidden = true;
                 if (!notNofity) {
@@ -177,13 +175,5 @@
     domUtils.on( window, 'scroll', function (evt,el) {
         closeAllPopup( evt,el );
     } );
-
-//    var lastVpRect = uiUtils.getViewportRect();
-//    domUtils.on( window, 'resize', function () {
-//        var vpRect = uiUtils.getViewportRect();
-//        if (vpRect.width != lastVpRect.width || vpRect.height != lastVpRect.height) {
-//            closeAllPopup();
-//        }
-//    } );
 
 })();
