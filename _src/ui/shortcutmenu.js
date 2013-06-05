@@ -6,8 +6,7 @@
         domUtils = baidu.editor.dom.domUtils;
 
     var allMenus = [],//存储所有快捷菜单
-        isSubMenuShow = false,//是否有子pop显示
-        isPopClick = false;//是否是子pop点击
+        isSubMenuShow = false;//是否有子pop显示
 
     var ShortCutMenu = UI.ShortCutMenu = function ( options ) {
         this.initOptions ( options );
@@ -31,15 +30,15 @@
 
             domUtils.on ( doc , "mousemove" , function ( e ) {
                 if ( me.isHidden === false ) {
-                    //有pop显示，或则点击pop，就不隐藏快捷菜单(需要重新移到弹出菜单上才能隐藏)
-                    if ( me.getSubMenuMark () || isPopClick )   return;
+                    //有pop显示就不隐藏快捷菜单
+                    if ( me.getSubMenuMark () )   return;
 
                     var flag = true,
                         el = me.getDom (),
                         wt = el.offsetWidth,
                         ht = el.offsetHeight,
-                        distanceX = wt / 2 + 50,//距离中心X标准
-                        distanceY = ht / 2 + 50,//距离中心Y标准
+                        distanceX = wt / 2 + 15,//距离中心X标准
+                        distanceY = ht / 2 + 15,//距离中心Y标准
                         x = Math.abs ( e.screenX - me.left ),//离中心距离横坐标
                         y = Math.abs ( e.screenY - me.top );//离中心距离纵坐标
 
@@ -62,18 +61,9 @@
                 }
             } );
 
-            domUtils.on ( document , "mouseover" , function ( e ) {
-                var tgt = e.target || e.srcElement;
-                var src = tgt.getAttribute ( "data-src" );
-                if ( src == "shortcutmenu" ) {
-                    isPopClick = false;
-                }
-            } );
-
             me.editor.addListener ( "afterhidepop" , function () {
                 if ( ! me.isHidden ) {
                     isSubMenuShow = true;
-                    isPopClick = true;
                 }
             } );
         } ,
