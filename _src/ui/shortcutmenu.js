@@ -31,7 +31,7 @@
 
             domUtils.on ( doc , "mousemove" , function ( e ) {
                 if ( me.isHidden === false ) {
-                    //如果有pop显示，就不隐藏快捷菜单
+                    //有pop显示，或则点击pop，就不隐藏快捷菜单(需要重新移到弹出菜单上才能隐藏)
                     if ( me.getSubMenuMark () || isPopClick )   return;
 
                     var flag = true,
