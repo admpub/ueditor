@@ -7,6 +7,7 @@ Version 1.2.7
     3.http://www.ueditorbbs.com/forum.php?mod=viewthread&tid=17640&page=1#pid33601
     新功能
     1.查找替换支持正则表达式
+    2.新增快捷菜单操作(右键或则选择文本出现)
 
 Version 1.2.6
     1.优化了编辑器路径的设置，可以不用手动设置路径，自动识别相关路径，解决路径设置繁琐的问题
