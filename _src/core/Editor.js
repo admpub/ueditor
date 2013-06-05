@@ -670,6 +670,19 @@
          */
         _selectionChange: function (delay, evt) {
             var me = this;
+
+            //针对ie9下浏览器无法传递event做的处理
+            if(evt){
+                var customEvt = {
+                    target:evt.target||evt.srcElement,
+                    screenX:evt.screenX,
+                    screenY:evt.screenY,
+                    clientX: evt.clientX,
+                    clientY: evt.clientY
+                };
+            }
+
+
             //有光标才做selectionchange 为了解决未focus时点击source不能触发更改工具栏状态的问题（source命令notNeedUndo=1）
 //            if ( !me.selection.isFocus() ){
 //                return;
@@ -714,7 +727,7 @@
                 if (me.selection._cachedRange && me.selection._cachedStartElement) {
                     me.fireEvent('beforeselectionchange');
                     // 第二个参数causeByUi为true代表由用户交互造成的selectionchange.
-                    me.fireEvent('selectionchange', !!evt);
+                    me.fireEvent('selectionchange', !!evt,customEvt);
                     me.fireEvent('afterselectionchange');
                     me.selection.clear();
                 }
