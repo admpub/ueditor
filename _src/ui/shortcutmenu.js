@@ -68,12 +68,14 @@
             } );
         } ,
         initItems : function () {
-            for ( var i = 0, len = this.items.length ; i < len ; i ++ ) {
-                var item = this.items[i].toLowerCase ();
+            if ( utils.isArray ( this.items ) ) {
+                for ( var i = 0, len = this.items.length ; i < len ; i ++ ) {
+                    var item = this.items[i].toLowerCase ();
 
-                if ( UI[item] ) {
-                    this.items[i] = new UI[item] ( this.editor );
-                    this.items[i].className += " edui-shortcutsubmenu ";
+                    if ( UI[item] ) {
+                        this.items[i] = new UI[item] ( this.editor );
+                        this.items[i].className += " edui-shortcutsubmenu ";
+                    }
                 }
             }
         } ,
@@ -122,18 +124,27 @@
             this.isHidden = true;
         } ,
         postRender : function () {
-            for ( var i = 0, item ; item = this.items[i ++] ; ) {
-                item.postRender ();
+            if ( utils.isArray ( this.items ) ) {
+                for ( var i = 0, item ; item = this.items[i ++] ; ) {
+                    item.postRender ();
+                }
             }
         } ,
         getHtmlTpl : function () {
-            var buff = [];
-            for ( var i = 0 ; i < this.items.length ; i ++ ) {
-                buff[i] = this.items[i].renderHtml ();
+            var buff;
+            if ( utils.isArray ( this.items ) ) {
+                buff = [];
+                for ( var i = 0 ; i < this.items.length ; i ++ ) {
+                    buff[i] = this.items[i].renderHtml ();
+                }
+                buff = buff.join ( "" );
+            } else {
+                buff = this.items;
             }
+
             return '<div id="##" class="%% edui-toolbar" data-src="shortcutmenu" onselectstart="return false;" >' +
-                buff.join ( '' ) +
-                '</div>'
+                buff +
+                '</div>';
         }
     };
 

@@ -34,6 +34,7 @@ UE.plugins['shortcutmenu'] = function () {
                     } );
 
                     menu.render ();
+                    me.fireEvent("afterrendershortcutmenu",menu);
                 }
 
                 menu.show ( e);
