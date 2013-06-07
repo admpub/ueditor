@@ -106,7 +106,7 @@
             offset = uiUtils.getViewportOffsetByEvent ( e );
             el.style.cssText = "display:block;left:-9999px";
             offset.top -= el.offsetHeight + 20;
-            this.getDom ().style.cssText = "left:" + offset.left + "px;top:" + offset.top + "px;display:block";
+            this.getDom ().style.cssText = "position:absolute;left:" + offset.left + "px;top:" + offset.top + "px;display:block";
 
             if ( this.editor ) {
                 el.style.zIndex = this.editor.container.style.zIndex * 1 + 10;
