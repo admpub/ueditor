@@ -107,7 +107,7 @@
             el.style.cssText = "display:block;left:-9999px";
             offset.top -= el.offsetHeight + 20;
             el.style.cssText = "position:absolute;left:" + offset.left + "px;top:" + offset.top + "px;display:block";
-            this.setOpacity(el,0.5);
+            this.setOpacity(el,0.2);
             if ( this.editor ) {
                 el.style.zIndex = this.editor.container.style.zIndex * 1 + 10;
                 uiUtils.getFixedLayer ().style.zIndex = el.style.zIndex - 1;
