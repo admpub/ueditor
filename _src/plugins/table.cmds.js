@@ -27,7 +27,7 @@
             return getTableItemsByRange(this).table ? -1 : 0;
         },
         execCommand: function (cmd, opt) {
-            function createTable(opt, tableWidth, tdWidth) {
+            function createTable(opt, tdWidth) {
                 var html = [],
                     rowsNum = opt.numRows,
                     colsNum = opt.numCols;
@@ -38,7 +38,8 @@
                     }
                     html.push('</tr>')
                 }
-                return '<table width="' + tableWidth + '"   ><tbody>' + html.join('') + '</tbody></table>'
+                //禁止指定table-width
+                return '<table><tbody>' + html.join('') + '</tbody></table>'
             }
 
             if (!opt) {
@@ -48,19 +49,20 @@
                     tdvalign: this.options.tdvalign
                 })
             }
-
+            var me = this;
             var range = this.selection.getRange(),
                 start = range.startContainer,
                 firstParentBlock = domUtils.findParent(start, function (node) {
                     return domUtils.isBlockElm(node);
-                }, true);
-            var me = this,
-                defaultValue = getDefaultValue(me),
-                tableWidth = getTableWidth(me, true, defaultValue) - (firstParentBlock ? parseInt(domUtils.getXY(firstParentBlock).x, 10) : 0),
+                }, true) || me.body;
+
+            var defaultValue = getDefaultValue(me),
+                tableWidth = firstParentBlock.offsetWidth,
                 tdWidth = Math.floor(tableWidth / opt.numCols - defaultValue.tdPadding * 2 - defaultValue.tdBorder);
+
             //todo其他属性
             !opt.tdvalign && (opt.tdvalign = me.options.tdvalign);
-            me.execCommand("inserthtml", createTable(opt, tableWidth, tdWidth));
+            me.execCommand("inserthtml", createTable(opt, tdWidth));
         }
     };
 
@@ -180,7 +182,7 @@
             var table = getTableItemsByRange(this).table;
             if (table) {
                 var firstRow = table.rows[0];
-                return firstRow.getElementsByTagName('th').length == 0 ? 0 : -1
+                return firstRow.cells[firstRow.cells.length-1].tagName.toLowerCase() != 'th' ? 0 : -1
             }
             return -1;
         },
@@ -198,7 +200,7 @@
             var table = getTableItemsByRange(this).table;
             if (table) {
                 var firstRow = table.rows[0];
-                return firstRow.getElementsByTagName('th').length ? 0 : -1
+                return firstRow.cells[firstRow.cells.length-1].tagName.toLowerCase() == 'th' ? 0 : -1
             }
             return -1;
         },
@@ -207,6 +209,46 @@
             if (table) {
                 domUtils.remove(table.rows[0])
             }
+            var td = table.getElementsByTagName('td')[0];
+            this.selection.getRange().setStart(td, 0).setCursor(false, true);
+        }
+    };
+    UE.commands['inserttitlecol'] = {
+        queryCommandState: function () {
+            var table = getTableItemsByRange(this).table;
+            if (table) {
+                var lastRow = table.rows[table.rows.length-1];
+                return lastRow.getElementsByTagName('th').length ? -1 : 0;
+            }
+            return -1;
+        },
+        execCommand: function (cmd) {
+            var table = getTableItemsByRange(this).table;
+            if (table) {
+                getUETable(table).insertCol(0, 'th');
+            }
+            resetTdWidth(table, this);
+            var th = table.getElementsByTagName('th')[0];
+            this.selection.getRange().setStart(th, 0).setCursor(false, true);
+        }
+    };
+    UE.commands['deletetitlecol'] = {
+        queryCommandState: function () {
+            var table = getTableItemsByRange(this).table;
+            if (table) {
+                var lastRow = table.rows[table.rows.length-1];
+                return lastRow.getElementsByTagName('th').length ? 0 : -1;
+            }
+            return -1;
+        },
+        execCommand: function () {
+            var table = getTableItemsByRange(this).table;
+            if (table) {
+                for(var i = 0; i< table.rows.length; i++ ){
+                    domUtils.remove(table.rows[i].children[0])
+                }
+            }
+            resetTdWidth(table, this);
             var td = table.getElementsByTagName('td')[0];
             this.selection.getRange().setStart(td, 0).setCursor(false, true);
         }
@@ -284,7 +326,8 @@
         queryCommandState: function () {
             var tableItems = getTableItemsByRange(this),
                 cell = tableItems.cell;
-            return cell && cell.tagName == "TD" && getUETable(tableItems.table).rowsNum < this.options.maxRowNum ? 0 : -1;
+            return cell && (cell.tagName == "TD" || (cell.tagName == 'TH' && tableItems.tr !== tableItems.table.rows[0])) &&
+                getUETable(tableItems.table).rowsNum < this.options.maxRowNum ? 0 : -1;
         },
         execCommand: function () {
             var rng = this.selection.getRange(),
@@ -379,7 +422,8 @@
         queryCommandState: function (cmd) {
             var tableItems = getTableItemsByRange(this),
                 cell = tableItems.cell;
-            return cell && (cell.tagName == "TD" || cell.tagName == 'TH') && getUETable(tableItems.table).colsNum < this.options.maxColNum ? 0 : -1;
+            return cell && (cell.tagName == "TD" || (cell.tagName == 'TH' && cell !== tableItems.tr.cells[0])) &&
+                getUETable(tableItems.table).colsNum < this.options.maxColNum ? 0 : -1;
         },
         execCommand: function (cmd) {
             var rng = this.selection.getRange(),
@@ -388,6 +432,7 @@
             var cell = getTableItemsByRange(this).cell,
                 ut = getUETable(cell),
                 cellInfo = ut.getCellInfo(cell);
+
             //ut.insertCol(!ut.selectedTds.length ? cellInfo.colIndex:ut.cellsRange.beginColIndex);
             if (!ut.selectedTds.length) {
                 ut.insertCol(cellInfo.colIndex, cell);
@@ -733,7 +778,7 @@
                 table = start && domUtils.findParentByTagName(start, ["table"], true);
 
             if (table) {
-               table.setAttribute("align",value);
+                table.setAttribute("align",value);
             }
         }
     };
@@ -779,51 +824,13 @@
             }
         }
     };
-    UE.commands['sorttable'] = {
-        queryCommandState: function () {
-            var me = this,
-                tableItems = getTableItemsByRange(me);
-            if (!tableItems.cell) return -1;
-            var table = tableItems.table,
-                cells = table.getElementsByTagName("td");
-            for (var i = 0, cell; cell = cells[i++];) {
-                if (cell.rowSpan != 1 || cell.colSpan != 1) return -1;
-            }
-            return 0;
-        },
-        execCommand: function (cmd, fn) {
-            var me = this,
-                range = me.selection.getRange(),
-                bk = range.createBookmark(true),
-                tableItems = getTableItemsByRange(me),
-                cell = tableItems.cell,
-                ut = getUETable(tableItems.table),
-                cellInfo = ut.getCellInfo(cell);
-            ut.sortTable(cellInfo.cellIndex, fn);
-            range.moveToBookmark(bk).select();
-        }
-    };
 
-    UE.commands["enablesort"] = UE.commands["disablesort"] = {
-        queryCommandState: function () {
-            return getTableItemsByRange(this).table ? 0 : -1;
-        },
-        execCommand: function (cmd) {
-            var table = getTableItemsByRange(this).table;
-            table.setAttribute("data-sort", cmd == "enablesort" ? "sortEnabled" : "sortDisabled");
-        }
-    };
     UE.commands["settablebackground"] = {
         queryCommandState: function () {
-            var selecteds = getSelectedArr(this);
-
-            if( selecteds.length && selecteds[0].tagName.toLowerCase() === 'td' ) {
-                return 0;
-            }
-            return -1;
+            return getSelectedArr(this).length > 1 ? 0 : -1;
         },
         execCommand: function (cmd, value) {
-            var table, cells, ut;
+            var cells, ut;
             cells = getSelectedArr(this);
             ut = getUETable(cells[0]);
             ut.setBackground(cells, value);
@@ -870,16 +877,33 @@
             }
         }
     };
-
+    UE.commands["setbordervisible"] = {
+        queryCommandState: function (cmd) {
+            var table = getTableItemsByRange(this).table;
+            if (!table) return -1;
+            return 0;
+        },
+        execCommand: function () {
+            var table = getTableItemsByRange(this).table;
+            utils.each(domUtils.getElementsByTagName(table,'td'),function(td){
+                td.style.borderWidth = '1px';
+                td.style.borderStyle = 'solid';
+            })
+        }
+    };
     function resetTdWidth(table, editor) {
-        var tds = table.getElementsByTagName("td");
+        var tds = domUtils.getElementsByTagName(table,'td th');
         utils.each(tds, function (td) {
             td.removeAttribute("width");
         });
         table.setAttribute('width', getTableWidth(editor, true, getDefaultValue(editor, table)));
+        var tdsWidths = [];
         setTimeout(function () {
             utils.each(tds, function (td) {
-                (td.colSpan == 1) && td.setAttribute("width", td.offsetWidth + "");
+                (td.colSpan == 1) && tdsWidths.push(td.offsetWidth)
+            })
+            utils.each(tds, function (td,i) {
+                (td.colSpan == 1) && td.setAttribute("width", tdsWidths[i] + "");
             })
         }, 0);
     }

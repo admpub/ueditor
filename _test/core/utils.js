@@ -1,5 +1,23 @@
 module( "core.utils" );
 
+test( 'cssRule', function () {
+    var utils = te.obj[0];
+    utils.cssRule('test1','.test{width:300px;}');
+    var style = utils.cssRule('test1');
+    ok(/^\.test/.test(style));
+    utils.cssRule('test1','');
+    style = utils.cssRule('test1');
+    ok(!style);
+    var div = te.dom[2];
+    div.innerHTML = '<span class="test">sdfsdf</span>';
+    utils.cssRule('style_test','.test{display:block}');
+    utils.cssRule('style_test','.test{font-size:48px}');
+    var block = UE.dom.domUtils.getComputedStyle(div.firstChild,'display');
+    equals(block,'inline');
+    //删除样式
+    utils.cssRule('style_test','');
+    equals(UE.dom.domUtils.getComputedStyle(div.firstChild,'font-size'),'16px');
+} ) ;
 
 test( "makeInstance", function () {
     var utils = te.obj[0];
@@ -259,7 +277,7 @@ test( 'cssStyleToDomStyle', function () {
     if ( ua.browser.ie&&ua.browser.ie<9) {
         equal( utils.cssStyleToDomStyle( "float" ).toLowerCase(), "stylefloat", "float" );
     } else{
-            equal( utils.cssStyleToDomStyle( "float" ).toLowerCase(), "cssfloat", "float" );
+        equal( utils.cssStyleToDomStyle( "float" ).toLowerCase(), "cssfloat", "float" );
     }
     equal( utils.cssStyleToDomStyle( "styleFloat" ).toLowerCase(), "stylefloat", "styleFloat" );
 } );
@@ -274,14 +292,31 @@ test( "isEmptyObject", function () {
     equal( true, utils.isEmptyObject( [] ) );
     equal( true, utils.isEmptyObject( "" ) );
 } );
-
+//dong
+test( "fixColor", function () {
+    var utils = te.obj[0];
+    equal( '#953734', utils.fixColor("color", 'rgb(149, 55, 52)' ),'fixColor' );
+} );
+test( "sort", function () {
+    var utils = te.obj[0];
+    same( ["a", "df", "sdf", "asdf"], utils.sort(['a','asdf','df','sdf'], function(a,b){
+        if(a.length> b.length)
+            return 1;
+        else return 0;
+    }),'sort' );
+} );
+test( "domReady", function () {
+    var utils = te.obj[0];
+    expect(1);
+    utils.domReady(function(){ok(1,'domReady')});
+} );
 test( '4个padding属性', function () {
 //    var css = 'padding-bottom:0px; margin:0px 0px 20px; padding-left:0px; padding-right:4px; padding-top:0px';
     /*上下相同，左右相同*/
     var css = 'padding-bottom:3px;padding-left:2px;padding-right:2px;padding-top:3px';
     var result = UE.utils.optCss( css );
     equal(result,'padding:3px 2px;','上下相同，左右相同');
-        /*上下不同，左右相同*/
+    /*上下不同，左右相同*/
     css = 'padding-bottom:2px;padding-left:2px;padding-right:2px;padding-top:3px'  ;
     result = UE.utils.optCss( css );
     equal(result,'padding:3px 2px 2px;','上下不同，左右相同');
@@ -299,7 +334,7 @@ test( '4个margin属性', function () {
     css = 'margin-bottom:2px;margin-left:2px;margin-right:2px;margin-top:2px'  ;
     result = UE.utils.optCss( css );
     equal(result,'margin:2px;','全相同');
-        /*上下不同，左右相同*/
+    /*上下不同，左右相同*/
     css = 'margin-bottom:2px;margin-left:2px;margin-right:2px;margin-top:3px'  ;
     result = UE.utils.optCss( css );
     equal(result,'margin:3px 2px 2px;','上下不同，左右相同');
@@ -342,15 +377,15 @@ test( 'margin，border，padding属性混杂', function () {
 } ) ;
 
 test( 'each 遍历方法', function () {
-   var div =  te.dom[0];
-   div.innerHTML = '<span></span><span></span><span id="a"></span><span></span>';
-   UE.utils.each(div.getElementsByTagName('span'),function(node,i){
+    var div =  te.dom[0];
+    div.innerHTML = '<span></span><span></span><span id="a"></span><span></span>';
+    UE.utils.each(div.getElementsByTagName('span'),function(node,i){
         equal(node.tagName,'SPAN','遍历nodelist');
-   });
+    });
     var count = 0;
     UE.utils.each(div.getElementsByTagName('span'),function(node,i){
         count++;
-       if(node.id =='a')
+        if(node.id =='a')
             return false
     });
     equal(count,3);
@@ -384,3 +419,5 @@ test( 'transUnitToPx 转换', function () {
     equal(UE.utils.transUnitToPx('20pt'),'27px');
     equal(UE.utils.transUnitToPx('0pt'),'0');
 } ) ;
+
+

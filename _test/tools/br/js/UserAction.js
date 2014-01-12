@@ -33,38 +33,38 @@ UserAction = {
      * @private
      * @static
      * @param {HTMLElement}
-     *            target The target of the given event.
+        *            target The target of the given event.
      * @param {String}
-     *            type The type of event to fire. This can be any one of the
+        *            type The type of event to fire. This can be any one of the
      *            following: keyup, keydown, and keypress.
      * @param {Boolean}
-     *            bubbles (Optional) Indicates if the event can be bubbled up.
+        *            bubbles (Optional) Indicates if the event can be bubbled up.
      *            DOM Level 3 specifies that all key events bubble by default.
      *            The default is true.
      * @param {Boolean}
-     *            cancelable (Optional) Indicates if the event can be canceled
+        *            cancelable (Optional) Indicates if the event can be canceled
      *            using preventDefault(). DOM Level 3 specifies that all key
      *            events can be cancelled. The default is true.
      * @param {Window}
-     *            view (Optional) The view containing the target. This is
+        *            view (Optional) The view containing the target. This is
      *            typically the window object. The default is window.
      * @param {Boolean}
-     *            ctrlKey (Optional) Indicates if one of the CTRL keys is
+        *            ctrlKey (Optional) Indicates if one of the CTRL keys is
      *            pressed while the event is firing. The default is false.
      * @param {Boolean}
-     *            altKey (Optional) Indicates if one of the ALT keys is pressed
+        *            altKey (Optional) Indicates if one of the ALT keys is pressed
      *            while the event is firing. The default is false.
      * @param {Boolean}
-     *            shiftKey (Optional) Indicates if one of the SHIFT keys is
+        *            shiftKey (Optional) Indicates if one of the SHIFT keys is
      *            pressed while the event is firing. The default is false.
      * @param {Boolean}
-     *            metaKey (Optional) Indicates if one of the META keys is
+        *            metaKey (Optional) Indicates if one of the META keys is
      *            pressed while the event is firing. The default is false.
      * @param {int}
-     *            keyCode (Optional) The code for the key that is in use. The
+        *            keyCode (Optional) The code for the key that is in use. The
      *            default is 0.
      * @param {int}
-     *            charCode (Optional) The Unicode code for the character
+        *            charCode (Optional) The Unicode code for the character
      *            associated with the key being used. The default is 0.
      */
     simulateKeyEvent:function (target /* :HTMLElement */, type /* :String */, bubbles /* :Boolean */, cancelable /* :Boolean */, view /* :Window */, ctrlKey /* :Boolean */, altKey /* :Boolean */, shiftKey /* :Boolean */, metaKey /* :Boolean */, keyCode /* :int */, charCode /* :int */) /* :Void */ {
@@ -79,6 +79,10 @@ UserAction = {
         if (typeof type == 'string') {
             type = type.toLowerCase();
             switch (type) {
+                case "compositionend":
+                case "compositionstart":
+                case "paste":
+                case "cut":
                 case "keyup":
                 case "keydown":
                 case "keypress":
@@ -240,64 +244,64 @@ UserAction = {
      * @private
      * @static
      * @param {HTMLElement}
-     *            target The target of the given event.
+        *            target The target of the given event.
      * @param {String}
-     *            type The type of event to fire. This can be any one of the
+        *            type The type of event to fire. This can be any one of the
      *            following: click, dblclick, mousedown, mouseup, mouseout,
      *            mouseover, and mousemove.
      * @param {Boolean}
-     *            bubbles (Optional) Indicates if the event can be bubbled up.
+        *            bubbles (Optional) Indicates if the event can be bubbled up.
      *            DOM Level 2 specifies that all mouse events bubble by default.
      *            The default is true.
      * @param {Boolean}
-     *            cancelable (Optional) Indicates if the event can be canceled
+        *            cancelable (Optional) Indicates if the event can be canceled
      *            using preventDefault(). DOM Level 2 specifies that all mouse
      *            events except mousemove can be cancelled. The default is true
      *            for all events except mousemove, for which the default is
      *            false.
      * @param {Window}
-     *            view (Optional) The view containing the target. This is
+        *            view (Optional) The view containing the target. This is
      *            typically the window object. The default is window.
      * @param {int}
-     *            detail (Optional) The number of times the mouse button has
+        *            detail (Optional) The number of times the mouse button has
      *            been used. The default value is 1.
      * @param {int}
-     *            screenX (Optional) The x-coordinate on the screen at which
+        *            screenX (Optional) The x-coordinate on the screen at which
      *            point the event occured. The default is 0.
      * @param {int}
-     *            screenY (Optional) The y-coordinate on the screen at which
+        *            screenY (Optional) The y-coordinate on the screen at which
      *            point the event occured. The default is 0.
      * @param {int}
-     *            clientX (Optional) The x-coordinate on the client at which
+        *            clientX (Optional) The x-coordinate on the client at which
      *            point the event occured. The default is 0.
      * @param {int}
-     *            clientY (Optional) The y-coordinate on the client at which
+        *            clientY (Optional) The y-coordinate on the client at which
      *            point the event occured. The default is 0.
      * @param {Boolean}
-     *            ctrlKey (Optional) Indicates if one of the CTRL keys is
+        *            ctrlKey (Optional) Indicates if one of the CTRL keys is
      *            pressed while the event is firing. The default is false.
      * @param {Boolean}
-     *            altKey (Optional) Indicates if one of the ALT keys is pressed
+        *            altKey (Optional) Indicates if one of the ALT keys is pressed
      *            while the event is firing. The default is false.
      * @param {Boolean}
-     *            shiftKey (Optional) Indicates if one of the SHIFT keys is
+        *            shiftKey (Optional) Indicates if one of the SHIFT keys is
      *            pressed while the event is firing. The default is false.
      * @param {Boolean}
-     *            metaKey (Optional) Indicates if one of the META keys is
+        *            metaKey (Optional) Indicates if one of the META keys is
      *            pressed while the event is firing. The default is false.
      * @param {int}
-     *            button (Optional) The button being pressed while the event is
+        *            button (Optional) The button being pressed while the event is
      *            executing. The value should be 0 for the primary mouse button
      *            (typically the left button), 1 for the terciary mouse button
      *            (typically the middle button), and 2 for the secondary mouse
      *            button (typically the right button). The default is 0.
      * @param {HTMLElement}
-     *            relatedTarget (Optional) For mouseout events, this is the
+        *            relatedTarget (Optional) For mouseout events, this is the
      *            element that the mouse has moved to. For mouseover events,
      *            this is the element that the mouse has moved from. This
      *            argument is ignored for all other events. The default is null.
      */
-    simulateMouseEvent:function (target /* :HTMLElement */, type /* :String */, bubbles /* :Boolean */, cancelable /* :Boolean */, view /* :Window */, detail /* :int */, screenX /* :int */, screenY /* :int */, clientX /* :int */, clientY /* :int */, ctrlKey /* :Boolean */, altKey /* :Boolean */, shiftKey /* :Boolean */, metaKey /* :Boolean */, button /* :int */, relatedTarget /* :HTMLElement */) /* :Void */ {
+    simulateMouseEvent:function (target /* :HTMLElement */, type /* :String */, bubbles /* :Boolean */, cancelable /* :Boolean */, view /* :Window */, detail /* :int */, screenX /* :int */, screenY /* :int */, clientX /* :int */, clientY /* :int */, ctrlKey /* :Boolean */, altKey /* :Boolean */, shiftKey /* :Boolean */, metaKey /* :Boolean */, button /* :int */, relatedTarget /* :HTMLElement */,button) /* :Void */ {
 
         // check target
         target = typeof target == 'string' ? document.getElementById(target)
@@ -373,7 +377,6 @@ UserAction = {
         if (!this.isn(button)) {
             button = 0;
         }
-
         // try to create a mouse event
         var customEvent /* :MouseEvent */ = null;
 
@@ -381,9 +384,9 @@ UserAction = {
         if (this.isf(document.createEvent)) {
 
             customEvent = document.createEvent("MouseEvents");
-
             // Safari 2.x (WebKit 418) still doesn't implement initMouseEvent()
-            if (this.browser.ie !== 9 && customEvent.initMouseEvent) {
+            if (this.browser.ie < 9 && customEvent.initMouseEvent) {
+
                 customEvent.initMouseEvent(type, bubbles, cancelable, view,
                     detail, screenX, screenY, clientX, clientY, ctrlKey,
                     altKey, shiftKey, metaKey, button, relatedTarget);
@@ -458,6 +461,7 @@ UserAction = {
                     customEvent.button = 4;
                     break;
                 case 2:
+                    customEvent.button = 2;
                     // leave as is
                     break;
                 default:
@@ -492,13 +496,13 @@ UserAction = {
      * Simulates a mouse event on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to click on.
+        *            target The element to click on.
      * @param {String}
-     *            type The type of event to fire. This can be any one of the
+        *            type The type of event to fire. This can be any one of the
      *            following: click, dblclick, mousedown, mouseup, mouseout,
      *            mouseover, and mousemove.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method mouseEvent
      * @static
      */
@@ -509,16 +513,16 @@ UserAction = {
             options.screenX, options.screenY, options.clientX,
             options.clientY, options.ctrlKey, options.altKey,
             options.shiftKey, options.metaKey, options.button,
-            options.relatedTarget);
+            options.relatedTarget,options.button);
     },
 
     /**
      * Simulates a click on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to click on.
+        *            target The element to click on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method click
      * @static
      */
@@ -530,9 +534,9 @@ UserAction = {
      * Simulates a double click on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to double click on.
+        *            target The element to double click on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method dblclick
      * @static
      */
@@ -544,9 +548,9 @@ UserAction = {
      * Simulates a mousedown on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to act on.
+        *            target The element to act on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method mousedown
      * @static
      */
@@ -558,9 +562,9 @@ UserAction = {
      * Simulates a mousemove on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to act on.
+        *            target The element to act on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method mousemove
      * @static
      */
@@ -577,9 +581,9 @@ UserAction = {
      * YAHOO.util.Event.getRelatedTarget() to work correctly in both browsers.
      *
      * @param {HTMLElement}
-     *            target The element to act on.
+        *            target The element to act on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method mouseout
      * @static
      */
@@ -597,9 +601,9 @@ UserAction = {
      * browsers.
      *
      * @param {HTMLElement}
-     *            target The element to act on.
+        *            target The element to act on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method mouseover
      * @static
      */
@@ -611,9 +615,9 @@ UserAction = {
      * Simulates a mouseup on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to act on.
+        *            target The element to act on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method mouseup
      * @static
      */
@@ -630,9 +634,9 @@ UserAction = {
      * Simulates a contextmenu on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to show contextmenu.
+        *            target The element to show contextmenu.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method contextmenu
      * @static
      */
@@ -643,9 +647,9 @@ UserAction = {
      * Simulates a dragend on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to show dragend.
+        *            target The element to show dragend.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method dragend
      * @static
      */
@@ -656,9 +660,9 @@ UserAction = {
      * Simulates a blur on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to show blur.
+        *            target The element to show blur.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method blur
      * @static
      */
@@ -704,11 +708,11 @@ UserAction = {
      *
      * @private
      * @param {String}
-     *            type The type of event ("keyup", "keydown" or "keypress").
+        *            type The type of event ("keyup", "keydown" or "keypress").
      * @param {HTMLElement}
-     *            target The target of the event.
+        *            target The target of the event.
      * @param {Object}
-     *            options Options for the event. Either keyCode or charCode are
+        *            options Options for the event. Either keyCode or charCode are
      *            required.
      * @method fireKeyEvent
      * @static
@@ -722,12 +726,40 @@ UserAction = {
     },
 
     /**
+     * Simulates a cut event on a particular element.
+     *
+     * @param {HTMLElement}
+        *            target The element to act on.
+     * @param {Object}
+        *            options Additional event options (use DOM standard names).
+     * @method cut
+     * @static
+     */
+    cut:function (target /* :HTMLElement */, options /* :Object */) /* :Void */ {
+        this.fireKeyEvent("cut", target, options);
+    },
+
+    /**
+     * Simulates a paste event on a particular element.
+     *
+     * @param {HTMLElement}
+        *            target The element to act on.
+     * @param {Object}
+        *            options Additional event options (use DOM standard names).
+     * @method paste
+     * @static
+     */
+    paste:function ( target /* :HTMLElement */, options /* :Object */ ) /* :Void */ {
+        this.fireKeyEvent( "paste", target, options );
+    },
+
+    /**
      * Simulates a keydown event on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to act on.
+        *            target The element to act on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method keydown
      * @static
      */
@@ -739,9 +771,9 @@ UserAction = {
      * Simulates a keypress on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to act on.
+        *            target The element to act on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method keypress
      * @static
      */
@@ -753,14 +785,42 @@ UserAction = {
      * Simulates a keyup event on a particular element.
      *
      * @param {HTMLElement}
-     *            target The element to act on.
+        *            target The element to act on.
      * @param {Object}
-     *            options Additional event options (use DOM standard names).
+        *            options Additional event options (use DOM standard names).
      * @method keyup
      * @static
      */
     keyup:function (target /* :HTMLElement */, options /* Object */) /* :Void */ {
         this.fireKeyEvent("keyup", target, options);
+    },
+
+    /**
+     * Simulates a compositionstart event on a particular element.
+     *
+     * @param {HTMLElement}
+        *            target The element to act on.
+     * @param {Object}
+        *            options Additional event options (use DOM standard names).
+     * @method compositionstart
+     * @static
+     */
+    compositionstart:function (target /* :HTMLElement */, options /* Object */) /* :Void */ {
+        this.fireKeyEvent("compositionstart", target, options);
+    },
+
+    /**
+     * Simulates a compositionstart event on a particular element.
+     *
+     * @param {HTMLElement}
+        *            target The element to act on.
+     * @param {Object}
+        *            options Additional event options (use DOM standard names).
+     * @method compositionstart
+     * @static
+     */
+    compositionend:function (target /* :HTMLElement */, options /* Object */) /* :Void */ {
+        this.fireKeyEvent("compositionend", target, options);
     },
 
     /**
@@ -969,252 +1029,99 @@ UserAction = {
     },
 
     browser:(function () {
-        var win = window;
 
-        var numberify = function (s) {
-                var c = 0;
-                return parseFloat(s.replace(/\./g, function () {
-                    return (c++ == 1) ? '' : '.';
-                }));
-            },
-
-            nav = win && win.navigator,
-
+        var agent = navigator.userAgent.toLowerCase(),
+            opera = window.opera,
             o = {
 
-                /**
-                 * Internet Explorer version number or 0. Example: 6
-                 *
-                 * @property ie
-                 * @type float
-                 * @static
-                 */
-                ie:0,
+                ie		: !!window.ActiveXObject,
 
-                /**
-                 * Opera version number or 0. Example: 9.2
-                 *
-                 * @property opera
-                 * @type float
-                 * @static
-                 */
-                opera:0,
+                opera	: ( !!opera && opera.version ),
 
-                /**
-                 * Gecko engine revision number. Will evaluate to 1 if Gecko is
-                 * detected but the revision could not be found. Other browsers will
-                 * be 0. Example: 1.8
-                 *
-                 * <pre>
-                 * Firefox 1.0.0.4: 1.7.8   &lt;-- Reports 1.7
-                 * Firefox 1.5.0.9: 1.8.0.9 &lt;-- 1.8
-                 * Firefox 2.0.0.3: 1.8.1.3 &lt;-- 1.81
-                 * Firefox 3.0   &lt;-- 1.9
-                 * Firefox 3.5   &lt;-- 1.91
-                 * </pre>
-                 *
-                 * @property gecko
-                 * @type float
-                 * @static
-                 */
-                gecko:0,
+                webkit	: ( agent.indexOf( ' applewebkit/' ) > -1 ),
 
-                /**
-                 * AppleWebKit version. KHTML browsers that are not WebKit browsers
-                 * will evaluate to 1, other browsers 0. Example: 418.9
-                 *
-                 * <pre>
-                 * Safari 1.3.2 (312.6): 312.8.1 &lt;-- Reports 312.8 -- currently the
-                 *                                   latest available for Mac OSX 10.3.
-                 * Safari 2.0.2:         416     &lt;-- hasOwnProperty introduced
-                 * Safari 2.0.4:         418     &lt;-- preventDefault fixed
-                 * Safari 2.0.4 (419.3): 418.9.1 &lt;-- One version of Safari may run
-                 *                                   different versions of webkit
-                 * Safari 2.0.4 (419.3): 419     &lt;-- Tiger installations that have been
-                 *                                   updated, but not updated
-                 *                                   to the latest patch.
-                 * Webkit 212 nightly:   522+    &lt;-- Safari 3.0 precursor (with native SVG
-                 *                                   and many major issues fixed).
-                 * Safari 3.0.4 (523.12) 523.12  &lt;-- First Tiger release - automatic update
-                 *                                   from 2.x via the 10.4.11 OS patch
-                 * Webkit nightly 1/2008:525+    &lt;-- Supports DOMContentLoaded event.
-                 *                                   yahoo.com user agent hack removed.
-                 * </pre>
-                 *
-                 * http://en.wikipedia.org/wiki/Safari_version_history
-                 *
-                 * @property webkit
-                 * @type float
-                 * @static
-                 */
-                webkit:0,
 
-                /**
-                 * Chrome will be detected as webkit, but this property will also be
-                 * populated with the Chrome version number
-                 *
-                 * @property chrome
-                 * @type float
-                 * @static
-                 */
-                chrome:0,
+                mac	: ( agent.indexOf( 'macintosh' ) > -1 ),
 
-                safari:0,
 
-                firefox:0,
+                quirks : ( document.compatMode == 'BackCompat' )
+            };
 
-                maxthon:0,
-                maxthonIE:0,
 
-                /**
-                 * The mobile property will be set to a string containing any
-                 * relevant user agent information when a modern mobile browser is
-                 * detected. Currently limited to Safari on the iPhone/iPod Touch,
-                 * Nokia N-series devices with the WebKit-based browser, and Opera
-                 * Mini.
-                 *
-                 * @property mobile
-                 * @type string
-                 * @static
-                 */
-                mobile:null,
+        o.gecko =( navigator.product == 'Gecko' && !o.webkit && !o.opera );
 
-                /**
-                 * Adobe AIR version number or 0. Only populated if webkit is
-                 * detected. Example: 1.0
-                 *
-                 * @property air
-                 * @type float
-                 */
-                air:0,
+        var version = 0;
 
-                /**
-                 * Google Caja version number or 0.
-                 *
-                 * @property caja
-                 * @type float
-                 */
-                caja:nav && nav.cajaVersion,
+        // Internet Explorer 6.0+
+        if ( o.ie ){
+            version = parseFloat( agent.match( /msie (\d+)/ )[1] );
 
-                /**
-                 * Set to true if the pagebreak appears to be in SSL
-                 *
-                 * @property secure
-                 * @type boolean
-                 * @static
-                 */
-                secure:false,
+            o.ie = version;
 
-                /**
-                 * The operating system. Currently only detecting windows or
-                 * macintosh
-                 *
-                 * @property os
-                 * @type string
-                 * @static
-                 */
-                os:null
+            o.ie9Compat = document.documentMode == 9;
 
-            },
 
-            ua = nav && nav.userAgent,
 
-            loc = win && win.location,
+            o.ie8Compat = document.documentMode == 8;
 
-            href = loc && loc.href,
 
-            m;
+            o.ie7Compat = ( ( version == 7 && !document.documentMode )
+                || document.documentMode == 7 );
 
-        o.secure = href && (href.toLowerCase().indexOf("https") === 0);
 
-        if (ua) {
+            o.ie6Compat = ( version < 7 || o.quirks );
 
-            if ((/windows|win32/i).test(ua)) {
-                o.os = 'windows';
-            } else if ((/macintosh/i).test(ua)) {
-                o.os = 'macintosh';
-            } else if ((/rhino/i).test(ua)) {
-                o.os = 'rhino';
-            }
+            o.ie9above = version > 8;
 
-            // Modern KHTML browsers should qualify as Safari X-Grade
-            if ((/KHTML/).test(ua)) {
-                o.webkit = 1;
-            }
-            if (window.external && /(\d+\.\d)/.test(external.max_version)) {
+            o.ie9below = version < 9;
 
-                o.maxthon = parseFloat(RegExp['\x241']);
-                if (/MSIE/.test(ua)) {
-                    o.maxthonIE = 1;
-                    o.maxthon = 0;
-                }
+        }
 
-            }
-            // Modern WebKit browsers are at least X-Grade
-            m = ua.match(/AppleWebKit\/([^\s]*)/);
-            if (m && m[1]) {
-                o.webkit = numberify(m[1]);
-
-                // Mobile browser check
-                if (/ Mobile\//.test(ua)) {
-                    o.mobile = "Apple"; // iPhone or iPod Touch
-                } else {
-                    m = ua.match(/NokiaN[^\/]*|Android \d\.\d|webOS\/\d\.\d/);
-                    if (m) {
-                        o.mobile = m[0]; // Nokia N-series, Android, webOS,
-                        // ex:
-                        // NokiaN95
-                    }
-                }
-
-                var m1 = ua.match(/Safari\/([^\s]*)/);
-                if (m1 && m1[1]) // Safari
-                    o.safari = numberify(m1[1]);
-                m = ua.match(/Chrome\/([^\s]*)/);
-                if (o.safari && m && m[1]) {
-                    o.chrome = numberify(m[1]); // Chrome
-                } else {
-                    m = ua.match(/AdobeAIR\/([^\s]*)/);
-                    if (m) {
-                        o.air = m[0]; // Adobe AIR 1.0 or better
-                    }
-                }
-            }
-
-            if (!o.webkit) { // not webkit
-                // @todo check Opera/8.01 (J2ME/MIDP; Opera Mini/2.0.4509/1316;
-                // fi; U;
-                // try get firefox and it's ver
-                // ssr)
-                m = ua.match(/Opera[\s\/]([^\s]*)/);
-                if (m && m[1]) {
-                    m = ua.match(/Version[\s\/]([^\s]*)/);
-                    o.opera = numberify(m[1]);
-                    m = ua.match(/Opera Mini[^;]*/);
-                    if (m) {
-                        o.mobile = m[0]; // ex: Opera Mini/2.0.4509/1316
-                    }
-                } else { // not opera or webkit
-                    m = ua.match(/MSIE\s([^;]*)/);
-                    if (m && m[1]) {
-                        o.ie = numberify(m[1]);
-                    } else { // not opera, webkit, or ie
-                        m = ua.match(/Gecko\/([^\s]*)/);
-                        if (m) {
-                            o.gecko = 1; // Gecko detected, look for revision
-                            m = ua.match(/rv:([^\s\)]*)/);
-                            if (m && m[1]) {
-                                o.gecko = numberify(m[1]);
-                            }
-                        }
-                    }
-                }
+        // Gecko.
+        if ( o.gecko ){
+            var geckoRelease = agent.match( /rv:([\d\.]+)/ );
+            if ( geckoRelease )
+            {
+                geckoRelease = geckoRelease[1].split( '.' );
+                version = geckoRelease[0] * 10000 + ( geckoRelease[1] || 0 ) * 100 + ( geckoRelease[2] || 0 ) * 1;
             }
         }
 
+
+        if (/chrome\/(\d+\.\d)/i.test(agent)) {
+            o.chrome = + RegExp['\x241'];
+        }
+
+
+        if(/(\d+\.\d)?(?:\.\d)?\s+safari\/?(\d+\.\d+)?/i.test(agent) && !/chrome/i.test(agent)){
+            o.safari = + (RegExp['\x241'] || RegExp['\x242']);
+        }
+
+
+        // Opera 9.50+
+        if ( o.opera )
+            version = parseFloat( opera.version() );
+
+        // WebKit 522+ (Safari 3+)
+        if ( o.webkit )
+            version = parseFloat( agent.match( / applewebkit\/(\d+)/ )[1] );
+
+
+        o.version = version;
+
+
+        o.isCompatible =
+            !o.mobile && (
+                ( o.ie && version >= 6 ) ||
+                    ( o.gecko && version >= 10801 ) ||
+                    ( o.opera && version >= 9.5 ) ||
+                    ( o.air && version >= 1 ) ||
+                    ( o.webkit && version >= 522 ) ||
+                    false );
+
         return o;
-    })
-        (),
+})
+(),
 
     /**
      * 提供队列方式执行用例的方案，接口包括start、add、next，方法全部执行完毕时会启动用例继续执行
@@ -1665,6 +1572,14 @@ UserAction = {
             return ele.style['cssFloat'];
     },
 
+    getComputedStyle:function(ele ){
+        if(this.browser.ie&&ua.browser.ie<9){
+            return ele.currentStyle;
+        }else{
+            return window.getComputedStyle(ele);
+        }
+    },
+
     readTxt:function (name, f) {
         var args = {};
         args['name'] = './txt/' + name;
@@ -1692,8 +1607,8 @@ UserAction = {
             styleValue = styleValue.substring(0, styleValue.length - 1);
         return styleValue;
     }, checkNodeStyle:function (nodeA, nodeB) {
-        var nodeAStyle = this.removeEndSemicolon(nodeA.getAttr("style").replace(/\s+/g, "")).split(";");
-        var nodeBStyle = this.removeEndSemicolon(nodeB.getAttr("style").replace(/\s+/g, "")).split(";");
+        var nodeAStyle = this.removeEndSemicolon(nodeA.getAttr("style").replace(/\s+/g, "")).replace(/&quot;/g,'').split(";");
+        var nodeBStyle = this.removeEndSemicolon(nodeB.getAttr("style").replace(/\s+/g, "")).replace(/&quot;/g,'').split(";");
         var lengthA = nodeAStyle.length;
         var lengthB = nodeBStyle.length;
         if (!(lengthA && lengthB))
@@ -1702,9 +1617,18 @@ UserAction = {
             return false;
         else {
             for (var i = 0; i < lengthA; i++) {
-                if (nodeAStyle[i].match(/\w+\s*:/)) {
-                    var styleName = nodeAStyle[i].match(/\w+\s*:/)[0].replace(/\s*:/, "");
-                    if (nodeA.getStyle(styleName).toLowerCase().replace(/\s+/g, "") != nodeB.getStyle(styleName).toLowerCase().replace(/\s+/g, ""))
+                if (nodeAStyle[i].match(/[-\w]+\s*:/) ) {
+                    var styleName = nodeAStyle[i].match(/[-\w]+\s*:/)[0].replace(/\s*:/, "");
+                    nodeA.attrs.style = nodeA.attrs.style.replace(/&quot;/g,'');
+                    nodeB.attrs.style = nodeB.attrs.style.replace(/&quot;/g,'');
+                    var styleValueA = nodeA.getStyle(styleName).toLowerCase().replace(/\s+/g, "");
+                    var styleValueB = nodeB.getStyle(styleName).toLowerCase().replace(/\s+/g, "");
+                    if(/color/.test(styleName)){
+                        styleValueA = this.formatColor(styleValueA);
+                        styleValueB = this.formatColor(styleValueB);
+                    }
+                    else;
+                    if (styleValueA != styleValueB)
                         return false;
                 }
             }
@@ -1718,7 +1642,12 @@ UserAction = {
             }
         }
         return count;
-    }, checkSameNodeAttrs:function (nodeA, nodeB) {
+    },formHref:function(str){
+        if(str.lastIndexOf('/')== str.length-1){
+            str = str.substring(0,str.length-1);
+        }
+        return str;
+    },checkSameNodeAttrs:function (nodeA, nodeB) {
         var lengthA = this.getPropertyCount(nodeA.attrs);
         var lengthB = this.getPropertyCount(nodeB.attrs);
         if (!(lengthA && lengthB))
@@ -1735,13 +1664,18 @@ UserAction = {
                     if (!this.checkNodeStyle(nodeA, nodeB))
                         return false;
                 }
+                else if(p.toLowerCase() == "href"){
+                    if (this.formHref(nodeA.getAttr(p).toLowerCase()) != this.formHref(nodeB.getAttr(p).toLowerCase()))
+                        return false;
+                }
                 else {
-                    if (nodeA.getAttr(p).toLowerCase() != nodeB.getAttr(p).toLowerCase())
+                    if (nodeA.getAttr(p).toLowerCase().replace(/^\s+|\s+$/g, "") != nodeB.getAttr(p).toLowerCase().replace(/^\s+|\s+$/g, ""))
                         return false;
                 }
             }
         }
         return true;
+
     }, checkChildren:function (nodeA, nodeB) {
         if (!(nodeA.children || nodeB.children))
             return true;
@@ -1772,6 +1706,13 @@ UserAction = {
             return true;
     }, checkSameHtml:function (stringA, stringB, scholium) {
         ok(this.checkSameNode(UE.htmlparser(stringA), UE.htmlparser(stringB)), scholium);
+    },
+    getContextmenuIndexByName:function(contextmenu,name){
+        for(var i=0;i<contextmenu.length;i++){
+            if(contextmenu[i].innerText ==name || contextmenu[i].textContent ==name)
+                return i;
+        }
+        return 0;
     }
 };
 var ua = UserAction;

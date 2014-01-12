@@ -12,7 +12,6 @@
 
     var allPopups = [];
     function closeAllPopup( evt,el ){
-        var newAll = [];
         for ( var i = 0; i < allPopups.length; i++ ) {
             var pop = allPopups[i];
             if (!pop.isHidden()) {
@@ -22,6 +21,9 @@
                 }
             }
         }
+
+        if(allPopups.length)
+            pop.editor.fireEvent("afterhidepop");
     }
 
     Popup.postHide = closeAllPopup;
@@ -40,9 +42,9 @@
             allPopups.push( this );
         },
         getHtmlTpl: function (){
-            return '<div id="##" class="edui-popup %%">' +
+            return '<div id="##" class="edui-popup %%" onmousedown="return false;">' +
                 ' <div id="##_body" class="edui-popup-body">' +
-                ' <iframe style="position:absolute;z-index:-1;left:0;top:0;background-color: transparent;" frameborder="0" width="100%" height="100%" src="javascript:"></iframe>' +
+                ' <iframe style="position:absolute;z-index:-1;left:0;top:0;background-color: transparent;" frameborder="0" width="100%" height="100%" src="about:blank"></iframe>' +
                 ' <div class="edui-shadow"></div>' +
                 ' <div id="##_content" class="edui-popup-content">' +
                 this.getContentHtmlTpl() +
@@ -63,8 +65,69 @@
         },
         _UIBase_postRender: UIBase.prototype.postRender,
         postRender: function (){
+
+
             if (this.content instanceof UIBase) {
                 this.content.postRender();
+            }
+
+            //捕获鼠标滚轮
+            if( this.captureWheel && !this.captured ) {
+
+                this.captured = true;
+
+                var winHeight = ( document.documentElement.clientHeight || document.body.clientHeight )  - 80,
+                    _height = this.getDom().offsetHeight,
+                    _top = uiUtils.getClientRect( this.combox.getDom() ).top,
+                    content = this.getDom('content'),
+                    ifr = this.getDom('body').getElementsByTagName('iframe'),
+                    me = this;
+
+                ifr.length && ( ifr = ifr[0] );
+
+                while( _top + _height > winHeight ) {
+                    _height -= 30;
+                    content.style.height = _height + 'px';
+                    //同步更改iframe高度
+                    ifr && ( ifr.style.height = _height + 'px' );
+                }
+
+                //阻止在combox上的鼠标滚轮事件, 防止用户的正常操作被误解
+                if( window.XMLHttpRequest ) {
+
+                    domUtils.on( content, ( 'onmousewheel' in document.body ) ? 'mousewheel' :'DOMMouseScroll' , function(e){
+
+                        if(e.preventDefault) {
+                            e.preventDefault();
+                        } else {
+                            e.returnValue = false;
+                        }
+
+                        if( e.wheelDelta ) {
+
+                            content.scrollTop -= ( e.wheelDelta / 120 )*60;
+
+                        } else {
+
+                            content.scrollTop -= ( e.detail / -3 )*60;
+
+                        }
+
+                    });
+
+                } else {
+
+                    //ie6
+                    domUtils.on( this.getDom(), 'mousewheel' , function(e){
+
+                        e.returnValue = false;
+
+                        me.getDom('content').scrollTop -= ( e.wheelDelta / 120 )*60;
+
+                    });
+
+                }
+
             }
             this.fireEvent('postRenderAfter');
             this.hide(true);
@@ -80,12 +143,24 @@
             return uiUtils.getClientRect(box);
         },
         fitSize: function (){
+            if( this.captureWheel && this.sized ) {
+                return this.__size;
+            }
+            this.sized = true;
             var popBodyEl = this.getDom('body');
             popBodyEl.style.width = '';
             popBodyEl.style.height = '';
             var size = this.mesureSize();
-            popBodyEl.style.width = size.width + 'px';
+            if( this.captureWheel ) {
+                popBodyEl.style.width =  -(-20 -size.width) + 'px';
+                var height = parseInt( this.getDom('content').style.height, 10 );
+                !window.isNaN( height ) && ( size.height = height );
+            } else {
+                popBodyEl.style.width =  size.width + 'px';
+            }
             popBodyEl.style.height = size.height + 'px';
+            this.__size = size;
+            this.captureWheel && (this.getDom('content').style.overflow = 'auto');
             return size;
         },
         showAnchor: function ( element, hoz ){
@@ -156,7 +231,6 @@
         },
         hide: function (notNofity){
             if (!this._hidden && this.getDom()) {
-//                this.getDom().style.visibility = 'hidden';
                 this.getDom().style.display = 'none';
                 this._hidden = true;
                 if (!notNofity) {
@@ -177,13 +251,5 @@
     domUtils.on( window, 'scroll', function (evt,el) {
         closeAllPopup( evt,el );
     } );
-
-//    var lastVpRect = uiUtils.getViewportRect();
-//    domUtils.on( window, 'resize', function () {
-//        var vpRect = uiUtils.getViewportRect();
-//        if (vpRect.width != lastVpRect.width || vpRect.height != lastVpRect.height) {
-//            closeAllPopup();
-//        }
-//    } );
 
 })();

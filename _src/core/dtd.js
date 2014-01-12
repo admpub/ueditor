@@ -1,7 +1,7 @@
 ///import editor.js
 ///import core/dom/dom.js
 ///import core/utils.js
-/**
+/*
  * dtd html语义化的体现类
  * @constructor
  * @namespace dtd
@@ -134,7 +134,8 @@ var dtd = dom.dtd = (function() {
         noframes : P,
         big : L,
         small : L,
-        span :_({'#':1,br:1}),
+        //trace:
+        span :_({'#':1,br:1,b:1,strong:1,u:1,i:1,em:1,sub:1,sup:1,strike:1,span:1}),
         hr : L,
         dt : L,
         sub : L,

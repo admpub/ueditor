@@ -2,7 +2,7 @@
 ///commands 字数统计
 ///commandsName  WordCount,wordCount
 ///commandsTitle  字数统计
-/**
+/*
  * Created by JetBrains WebStorm.
  * User: taoqili
  * Date: 11-9-7
@@ -12,6 +12,7 @@
 
 UE.plugins['wordcount'] = function(){
     var me = this;
+    me.setOpt('wordCount',true);
     me.addListener('contentchange',function(){
         me.fireEvent('wordcount');
     });

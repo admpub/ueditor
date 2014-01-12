@@ -2,7 +2,7 @@
 ///commands 当输入内容超过编辑器高度时，编辑器自动增高
 ///commandsName  AutoHeight,autoHeightEnabled
 ///commandsTitle  自动增高
-/**
+/*
  * @description 自动伸展
  * @author zhanyi
  */
@@ -15,7 +15,6 @@ UE.plugins['autoheight'] = function () {
     }
 
     var bakOverflow,
-        span, tmpNode,
         lastHeight = 0,
         options = me.options,
         currentHeight,
@@ -25,43 +24,36 @@ UE.plugins['autoheight'] = function () {
         var me = this;
         clearTimeout(timer);
         if(isFullscreen)return;
-        timer = setTimeout(function () {
+        if (!me.queryCommandState || me.queryCommandState && me.queryCommandState('source') != 1) {
+            timer = setTimeout(function(){
 
-            if (me.queryCommandState && me.queryCommandState('source') != 1) {
-                if (!span) {
-                    span = me.document.createElement('span');
-                    //trace:1764
-                    span.style.cssText = 'display:block;width:0;margin:0;padding:0;border:0;clear:both;';
-                    span.innerHTML = '.';
+                var node = me.body.lastChild;
+                while(node && node.nodeType != 1){
+                    node = node.previousSibling;
                 }
-                tmpNode = span.cloneNode(true);
-                me.body.appendChild(tmpNode);
-
-                currentHeight = Math.max(domUtils.getXY(tmpNode).y + tmpNode.offsetHeight,Math.max(options.minFrameHeight, options.initialFrameHeight));
-
-                if (currentHeight != lastHeight) {
-
-                    me.setHeight(currentHeight);
-
-                    lastHeight = currentHeight;
+                if(node && node.nodeType == 1){
+                    node.style.clear = 'both';
+                    currentHeight = Math.max(domUtils.getXY(node).y + node.offsetHeight + 25 ,Math.max(options.minFrameHeight, options.initialFrameHeight)) ;
+                    if (currentHeight != lastHeight) {
+                        me.setHeight(currentHeight,true);
+                        lastHeight = currentHeight;
+                    }
+                    domUtils.removeStyle(node,'clear');
                 }
 
-                domUtils.remove(tmpNode);
 
-            }
-        }, 50);
+            },50)
+        }
     }
     var isFullscreen;
     me.addListener('fullscreenchanged',function(cmd,f){
         isFullscreen = f
     });
     me.addListener('destroy', function () {
-        me.removeListener('contentchange', adjustHeight);
-        me.removeListener('afterinserthtml',adjustHeight);
-        me.removeListener('keyup', adjustHeight);
-        me.removeListener('mouseup', adjustHeight);
+        me.removeListener('contentchange afterinserthtml keyup mouseup',adjustHeight)
     });
     me.enableAutoHeight = function () {
+        var me = this;
         if (!me.autoHeightEnabled) {
             return;
         }
@@ -69,13 +61,11 @@ UE.plugins['autoheight'] = function () {
         me.autoHeightEnabled = true;
         bakOverflow = doc.body.style.overflowY;
         doc.body.style.overflowY = 'hidden';
-        me.addListener('contentchange', adjustHeight);
-        me.addListener('afterinserthtml',adjustHeight)
-        me.addListener('keyup', adjustHeight);
-        me.addListener('mouseup', adjustHeight);
+        me.addListener('contentchange afterinserthtml keyup mouseup',adjustHeight);
         //ff不给事件算得不对
+
         setTimeout(function () {
-            adjustHeight.call(this);
+            adjustHeight.call(me);
         }, browser.gecko ? 100 : 0);
         me.fireEvent('autoheightchanged', me.autoHeightEnabled);
     };
@@ -96,7 +86,8 @@ UE.plugins['autoheight'] = function () {
         domUtils.on(browser.ie ? me.body : me.document, browser.webkit ? 'dragover' : 'drop', function () {
             clearTimeout(timer);
             timer = setTimeout(function () {
-                adjustHeight.call(this);
+                //trace:3681
+                adjustHeight.call(me);
             }, 100);
 
         });

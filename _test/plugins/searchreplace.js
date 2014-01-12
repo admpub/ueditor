@@ -1,8 +1,28 @@
 module('plugins.searchreplace');
 
-/*trace 974,先替换再撤销再全部替换，则不会替换
- * ie下会出现的bug*/
-test('全部替换',function(){
+test('trace 3381：查找',function(){
+    if(ua.browser.opera)
+        return;
+    var editor = te.obj[0];
+    var range = te.obj[1];
+    editor.setContent('<p>hello啊</p>');
+    stop();
+    setTimeout(function(){
+        range.setStart(editor.body.firstChild,0).collapse(true).select();
+        var num = editor.execCommand('searchreplace',{searchStr:'啊'});
+
+        ua.manualDeleteFillData(editor.body);
+        equal(editor.body.firstChild.innerHTML,'hello啊');
+
+        equal(editor.selection.getRange().collapsed,false,'检查选区:不闭合为找到');
+        start();
+    },20);
+});
+//
+///*trace 974,先替换再撤销再全部替换，则不会替换
+//* ie下会出现的bug*/
+test(' trace 3697全部替换',function(){
+    //todo trace 3697
     if(ua.browser.opera)
         return;
     var editor = te.obj[0];
@@ -17,7 +37,7 @@ test('全部替换',function(){
 });
 
 ///*trace 917*/
-///*trace 3288*/
+///*trace 3288*/todo
 //test('替换内容包含查找内容,全部替换',function(){
 //    if(ua.browser.opera)
 //        return;
@@ -32,7 +52,7 @@ test('全部替换',function(){
 //});
 
 /*trace 973*/
-test('替换内容包含查找内容',function(){
+test(' trace 3697替换内容包含查找内容',function(){
     if(ua.browser.opera)
         return;
     var editor = te.obj[0];
@@ -47,7 +67,7 @@ test('替换内容包含查找内容',function(){
     equal(editor.body.firstChild.innerHTML,'欢迎回来');
 });
 //
-///*trace 1286*/
+///*trace 1286*/todo
 //test('连续2次全部替换',function(){
 //    if(ua.browser.opera)
 //        return;
@@ -66,11 +86,16 @@ test('替换内容为空',function(){
         return;
     var editor = te.obj[0];
     editor.setContent('<p>欢迎回来</p>');
-    editor.execCommand('searchreplace',{searchStr:'欢迎',replaceStr:''});
-    ua.manualDeleteFillData(editor.body);
-    equal(editor.body.firstChild.innerHTML,'回来');
+    stop();
+    setTimeout(function(){
+        editor.focus();
+        editor.execCommand('searchreplace',{searchStr:'欢迎',replaceStr:''});
+        ua.manualDeleteFillData(editor.body);
+        equal(editor.body.firstChild.innerHTML,'回来');
+        start();
+    },50);
 });
-
+//
 test('全部替换内容为空',function(){
     if(ua.browser.opera)
         return;
@@ -80,3 +105,18 @@ test('全部替换内容为空',function(){
     ua.manualDeleteFillData(editor.body);
     equal(editor.body.firstChild.innerHTML,'回来 啊');
 });
+
+//test('查找替换支持正则',function(){
+//    if(ua.browser.opera)
+//        return;
+//    var editor = te.obj[0];
+//    editor.setContent('<p>sd2323fasdfasd3434f</p>');
+//    //因为是字符表示的正则要做转换
+//    editor.execCommand('searchreplace',{searchStr:'/\\d+/',replaceStr:'',all:true});
+//    ua.manualDeleteFillData(editor.body);
+//    equal(editor.body.firstChild.innerHTML,'sdfasdfasdf');
+//    editor.setContent('<p>sd2323fasdfasd3434f</p><p>首都发生地2323方</p>');
+//    editor.execCommand('searchreplace',{searchStr:'/\\d+/',replaceStr:'',all:true});
+//    ua.manualDeleteFillData(editor.body);
+//    equal(editor.body.innerHTML.toLowerCase().replace(/>\s+</g,'><'),'<p>sdfasdfasdf</p><p>首都发生地方</p>');
+//});

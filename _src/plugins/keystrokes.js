@@ -54,7 +54,9 @@ UE.plugins['keystrokes'] = function() {
         if (keyCode == 8) {
             rng = me.selection.getRange();
             collapsed = rng.collapsed;
-
+            if(me.fireEvent('delkeydown',evt)){
+                return;
+            }
             var start,end;
             //避免按两次删除才能生效的问题
             if(rng.collapsed && rng.inFillChar()){
@@ -114,18 +116,18 @@ UE.plugins['keystrokes'] = function() {
             if (range.collapsed) {
                 range.insertNode(span.cloneNode(true).firstChild).setCursor(true);
             } else {
+                var filterFn = function(node) {
+                    return domUtils.isBlockElm(node) && !excludeTagNameForTabKey[node.tagName.toLowerCase()]
+
+                };
                 //普通的情况
-                start = domUtils.findParent(range.startContainer, filterFn);
-                end = domUtils.findParent(range.endContainer, filterFn);
+                start = domUtils.findParent(range.startContainer, filterFn,true);
+                end = domUtils.findParent(range.endContainer, filterFn,true);
                 if (start && end && start === end) {
                     range.deleteContents();
                     range.insertNode(span.cloneNode(true).firstChild).setCursor(true);
                 } else {
-                    var bookmark = range.createBookmark(),
-                        filterFn = function(node) {
-                            return domUtils.isBlockElm(node) && !excludeTagNameForTabKey[node.tagName.toLowerCase()]
-
-                        };
+                    var bookmark = range.createBookmark();
                     range.enlarge(true);
                     var bookmark2 = range.createBookmark(),
                         current = domUtils.getNextDomNode(bookmark2.start, false, filterFn);

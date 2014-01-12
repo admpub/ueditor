@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.IO;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 
 /// <summary>
@@ -29,7 +30,7 @@ public  class Uploader
   */
     public  Hashtable upFile(HttpContext cxt, string pathbase, string[] filetype, int size)
     {
-        pathbase = pathbase + DateTime.Now.ToString("yyyy-MM-dd") + "/";
+        pathbase = pathbase + "/";
         uploadpath = cxt.Server.MapPath(pathbase);//获取文件上传路径
 
         try
@@ -43,24 +44,33 @@ public  class Uploader
             //格式验证
             if (checkType(filetype))
             {
-                state = "不允许的文件类型";
+                //不允许的文件类型
+                state = "\u4e0d\u5141\u8bb8\u7684\u6587\u4ef6\u7c7b\u578b";
             }
             //大小验证
             if (checkSize(size))
             {
-                state = "文件大小超出网站限制";
+                //文件大小超出网站限制
+                state = "\u6587\u4ef6\u5927\u5c0f\u8d85\u51fa\u7f51\u7ad9\u9650\u5236";
             }
             //保存图片
             if (state == "SUCCESS")
             {
-                filename = reName();
-                uploadFile.SaveAs(uploadpath + filename);
-                URL = pathbase + filename;
+                filename = NameFormater.Format(cxt.Request["fileNameFormat"], originalName);
+                var testname = filename;
+                var ai = 1;
+                while (File.Exists(uploadpath + testname))
+                {
+                    testname =  Path.GetFileNameWithoutExtension(filename) + "_" + ai++ + Path.GetExtension(filename); 
+                }
+                uploadFile.SaveAs(uploadpath + testname);
+                URL = pathbase + testname;
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            state = "未知错误";
+            // 未知错误
+            state = "\u672a\u77e5\u9519\u8bef";
             URL = "";
         }
         return getUploadInfo();
@@ -198,5 +208,41 @@ public  class Uploader
         //{
         //    Directory.Delete(path, true);
         //}
+    }
+}
+
+
+public static class NameFormater
+{
+    public static string Format(string format, string filename)
+    {
+        if (String.IsNullOrWhiteSpace(format))
+        {
+            format = "{filename}{rand:6}";
+        }
+        string ext = Path.GetExtension(filename);
+        filename = Path.GetFileNameWithoutExtension(filename);
+        format = format.Replace("{filename}", filename);
+        format = new Regex(@"\{rand(\:?)(\d+)\}", RegexOptions.Compiled).Replace(format, new MatchEvaluator(delegate(Match match)
+        {
+            var digit = 6;
+            if (match.Groups.Count > 2)
+            {
+                digit = Convert.ToInt32(match.Groups[2].Value);
+            }
+            var rand = new Random();
+            return rand.Next((int)Math.Pow(10, digit), (int)Math.Pow(10, digit + 1)).ToString();
+        }));
+        format = format.Replace("{time}", DateTime.Now.Ticks.ToString());
+        format = format.Replace("{yyyy}", DateTime.Now.Year.ToString());
+        format = format.Replace("{yy}", (DateTime.Now.Year % 100).ToString("D2"));
+        format = format.Replace("{mm}", DateTime.Now.Month.ToString("D2"));
+        format = format.Replace("{dd}", DateTime.Now.Day.ToString("D2"));
+        format = format.Replace("{hh}", DateTime.Now.Hour.ToString("D2"));
+        format = format.Replace("{ii}", DateTime.Now.Minute.ToString("D2"));
+        format = format.Replace("{ss}", DateTime.Now.Second.ToString("D2"));
+        var invalidPattern = new Regex(@"[\\\/\:\*\?\042\<\>\|]");
+        format = invalidPattern.Replace(format, "");
+        return format + ext;
     }
 }

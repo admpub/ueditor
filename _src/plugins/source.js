@@ -1,9 +1,9 @@
-///import core
-///import plugins/serialize.js
-///import plugins/undo.js
-///commands 查看源码
-///commandsName  Source
-///commandsTitle  查看源码
+/**
+ * 源码编辑插件
+ * @file
+ * @since 1.2.6.1
+ */
+
 (function (){
     var sourceEditors = {
         textarea: function (editor, holder){
@@ -86,7 +86,7 @@
         var opt = this.options;
         var sourceMode = false;
         var sourceEditor;
-
+        var orgSetContent;
         opt.sourceEditor = browser.ie  ? 'textarea' : (opt.sourceEditor || 'codemirror');
 
         me.setOpt({
@@ -98,8 +98,31 @@
 
         var bakCssText;
         //解决在源码模式下getContent不能得到最新的内容问题
-        var oldGetContent = me.getContent,
+        var oldGetContent,
             bakAddress;
+
+        /**
+         * 切换源码模式和编辑模式
+         * @command source
+         * @method execCommand
+         * @param { String } cmd 命令字符串
+         * @example
+         * ```javascript
+         * editor.execCommand( 'source');
+         * ```
+         */
+
+        /**
+         * 查询当前编辑区域的状态是源码模式还是可视化模式
+         * @command source
+         * @method queryCommandState
+         * @param { String } cmd 命令字符串
+         * @return { int } 如果当前是源码编辑模式，返回1，否则返回0
+         * @example
+         * ```javascript
+         * editor.queryCommandState( 'source' );
+         * ```
+         */
 
         me.commands['source'] = {
             execCommand: function (){
@@ -117,7 +140,7 @@
 
 
                     me.fireEvent('beforegetcontent');
-                    var root = UE.htmlparser(me.body.innerHTML,true);
+                    var root = UE.htmlparser(me.body.innerHTML);
                     me.filterOutputRule(root);
                     root.traversal(function (node) {
                         if (node.type == 'element') {
@@ -145,6 +168,17 @@
                     sourceEditor = createSourceEditor(me.iframe.parentNode);
 
                     sourceEditor.setContent(content);
+
+                    orgSetContent = me.setContent;
+
+                    me.setContent = function(html){
+                        //这里暂时不触发事件，防止报错
+                        var root = UE.htmlparser(html);
+                        me.filterInputRule(root);
+                        html = root.toHtml();
+                        sourceEditor.setContent(html);
+                    };
+
                     setTimeout(function (){
                         sourceEditor.select();
                         me.addListener('fullscreenchanged', function(){
@@ -153,13 +187,25 @@
                             }catch(e){}
                         });
                     });
+
                     //重置getContent，源码模式下取值也能是最新的数据
+                    oldGetContent = me.getContent;
                     me.getContent = function (){
                         return sourceEditor.getContent() || '<p>' + (browser.ie ? '' : '<br/>')+'</p>';
                     };
                 } else {
                     me.iframe.style.cssText = bakCssText;
                     var cont = sourceEditor.getContent() || '<p>' + (browser.ie ? '' : '<br/>')+'</p>';
+                    //处理掉block节点前后的空格,有可能会误命中，暂时不考虑
+                    cont = cont.replace(new RegExp('[\\r\\t\\n ]*<\/?(\\w+)\\s*(?:[^>]*)>','g'), function(a,b){
+                        if(b && !dtd.$inlineWithA[b.toLowerCase()]){
+                            return a.replace(/(^[\n\r\t ]*)|([\n\r\t ]*$)/g,'');
+                        }
+                        return a.replace(/(^[\n\r\t]*)|([\n\r\t]*$)/g,'')
+                    });
+
+                    me.setContent = orgSetContent;
+
                     me.setContent(cont);
                     sourceEditor.dispose();
                     sourceEditor = null;
@@ -171,6 +217,8 @@
                         me.body.innerHTML = '<p>'+(browser.ie?'':'<br/>')+'</p>';
                         first = me.body.firstChild;
                     }
+
+
                     //要在ifm为显示时ff才能取到selection,否则报错
                     //这里不能比较位置了
                     me.undoManger && me.undoManger.save(true);

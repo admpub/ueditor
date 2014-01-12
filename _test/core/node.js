@@ -124,9 +124,9 @@ test( 'getStyle', function() {
     node.innerHTML('<div style="border:1px solid #ccc"><div>');
     node = node.firstChild();
     equals(node.getStyle('color'),'','无color样式，取color样式');
-    node.innerHTML('<div style="border:1px solid #ccc;color:#ccc"><div>');
+    node.innerHTML('<div style=" border:1px solid #ccc; background-color:#fff; color:#ccc"></div>');
     node = node.firstChild();
-    equals(node.getStyle('border'),'1px solid #ccc','有2个样式，取其一');
+    equals(node.getStyle('color'),'#ccc','有2个样式，取其一');
 });
 
 test( 'setStyle', function() {
@@ -159,6 +159,18 @@ test( 'setStyle', function() {
     equals(node.firstChild().toHtml(),'<div style="color:#ccc"></div>','删除分号');
     node.innerHTML('<div style="border:1px solid #ccc;color:#ccc" dfasdfas="sdfsdf" sdfsdf="sdfsdfs" ></div>');
     equals(node.firstChild().toHtml(),'<div style="border:1px solid #ccc;color:#ccc" dfasdfas="sdfsdf" sdfsdf="sdfsdfs"></div>');
+
+    node.innerHTML('<div style=" border:1px "></div>');
+    node.firstChild().setStyle('border');
+
+    equals(node.firstChild().toHtml(),'<div></div>');
+    node.innerHTML('<div style=" border:1px solid #ccc; background-color:#fff; color:#ccc"></div>');
+    node.firstChild().setStyle('border');
+    equals(node.firstChild().toHtml(),'<div style="background-color:#fff; color:#ccc"></div>');
+    node.firstChild().setStyle('color');
+    equals(node.firstChild().toHtml(),'<div style="background-color:#fff;"></div>');
+    node.firstChild().setStyle('background-color');
+    equals(node.firstChild().toHtml(),'<div></div>');
 });
 
 test( 'getIndex', function() {

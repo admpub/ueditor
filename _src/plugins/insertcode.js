@@ -1,12 +1,13 @@
-///import core
-///import plugins/inserthtml.js
-///commands 插入代码
-///commandsName  code
-///commandsTitle  插入代码
+/**
+ * 插入代码插件
+ * @file
+ * @since 1.2.6.1
+ */
+
 UE.plugins['insertcode'] = function() {
     var me = this;
     me.ready(function(){
-        utils.cssRule('pre','pre{margin:.5em 0;padding:.4em .6em;border-radius:8px;background:#f8f8f8;line-height:1.5}',
+        utils.cssRule('pre','pre{margin:.5em 0;padding:.4em .6em;border-radius:8px;background:#f8f8f8;}',
             me.document)
     });
     me.setOpt('insertcode',{
@@ -35,6 +36,31 @@ UE.plugins['insertcode'] = function() {
             'vb':'Vb',
             'xml':'Xml'
     });
+
+    /**
+     * 插入代码
+     * @command insertcode
+     * @method execCommand
+     * @param { String } cmd 命令字符串
+     * @param { String } lang 插入代码的语言
+     * @example
+     * ```javascript
+     * editor.execCommand( 'insertcode', 'javascript' );
+     * ```
+     */
+
+    /**
+     * 如果选区所在位置是插入插入代码区域，返回代码的语言
+     * @command insertcode
+     * @method queryCommandValue
+     * @param { String } cmd 命令字符串
+     * @return { String } 返回代码的语言
+     * @example
+     * ```javascript
+     * editor.queryCommandValue( 'insertcode' );
+     * ```
+     */
+
     me.commands['insertcode'] = {
         execCommand : function(cmd,lang){
             var me = this,
@@ -96,7 +122,7 @@ UE.plugins['insertcode'] = function() {
                                             }else{
                                                 code += cn.data
                                             }
-                                        })
+                                        });
                                         if(!/br>$/.test(code)){
                                             code += '<br>';
                                         }
@@ -126,7 +152,9 @@ UE.plugins['insertcode'] = function() {
                 pre = me.document.getElementById('coder');
                 domUtils.removeAttributes(pre,'id');
                 var tmpNode = pre.previousSibling;
-                if(tmpNode && domUtils.isEmptyBlock(tmpNode)){
+
+                if(tmpNode && (tmpNode.nodeType == 3 && tmpNode.nodeValue.length == 1 && browser.ie && browser.version == 6 ||  domUtils.isEmptyBlock(tmpNode))){
+
                     domUtils.remove(tmpNode)
                 }
                 var rng = me.selection.getRange();
@@ -182,9 +210,16 @@ UE.plugins['insertcode'] = function() {
             var code = '';
             utils.each(pre.children,function(n){
                if(n.type == 'text'){
-                   code += n.data.replace(/[ ]/g,'&nbsp;');
+                   //在ie下文本内容有可能末尾带有\n要去掉
+                   //trace:3396
+                   code += n.data.replace(/[ ]/g,'&nbsp;').replace(/\n$/,'');
                }else{
-                   code  += '\n'
+                   if(n.tagName == 'br'){
+                       code  += '\n'
+                   }else{
+                       code += (!dtd.$empty[n.tagName] ? '' : n.innerText());
+                   }
+
                }
 
             });
@@ -204,7 +239,6 @@ UE.plugins['insertcode'] = function() {
         preview:1,
         insertparagraph:1,
         elementpath:1,
-        highlightcode:1,
         insertcode:1,
         inserthtml:1,
         selectall:1
@@ -227,11 +261,11 @@ UE.plugins['insertcode'] = function() {
             if(!rng.collapsed){
                rng.deleteContents();
             }
-            if(!browser.ie ){
+            if(!browser.ie || browser.ie9above){
                 var tmpNode = me.document.createElement('br'),pre;
                 rng.insertNode(tmpNode).setStartAfter(tmpNode).collapse(true);
                 var next = tmpNode.nextSibling;
-                if(!next){
+                if(!next && (!browser.ie || browser.version > 10)){
                     rng.insertNode(tmpNode.cloneNode(false));
                 }else{
                     rng.setStartAfter(tmpNode);
@@ -338,66 +372,6 @@ UE.plugins['insertcode'] = function() {
             me.fireEvent('saveScene');
             if(evt.shiftKey){
 
-//                if(!rng.collapsed){
-//                    var bk = rng.createBookmark();
-//                    var start = bk.start.previousSibling;
-//                    if(start === pre.firstChild){
-//                        start.nodeValue = start.nodeValue.replace(/^\s{4}/,'');
-//                    }else{
-//                        while(start){
-//                            if(domUtils.isBr(start)){
-//                                start = start.nextSibling;
-//                                start.nodeValue = start.nodeValue.replace(/^\s{4}/,'');
-//                                break;
-//                            }
-//                            while(start.previousSibling && start.previousSibling.nodeType == 3){
-//                                start.nodeValue = start.previousSibling.nodeValue + start.nodeValue;
-//                                domUtils.remove(start.previousSibling)
-//                            }
-//                            start = start.previousSibling;
-//                        }
-//                    }
-//
-//                    var end = bk.end;
-//                    start = bk.start.nextSibling;
-//
-//                    while(start && start !== end){
-//                        if(domUtils.isBr(start) && start.nextSibling){
-//                            if(start.nextSibling === end){
-//                                break;
-//                            }
-//                            start = start.nextSibling;
-//                            while(start.nextSibling && start.nextSibling.nodeType == 3){
-//                                start.nodeValue += start.nextSibling.nodeValue;
-//                                domUtils.remove(start.nextSibling)
-//                            }
-//
-//                            start.nodeValue = start.nodeValue.replace(/^\s{4}/,'');
-//                        }
-//
-//                        start = start.nextSibling;
-//                    }
-//                    rng.moveToBookmark(bk).select();
-//                }else{
-//                    var bk = rng.createBookmark();
-//                    var start = bk.start.previousSibling;
-//                    if(start === pre.firstChild){
-//                        start.nodeValue = start.nodeValue.replace(/^\s{4}/,'');
-//                    }else{
-//                        while(start){
-//                            if(domUtils.isBr(start)){
-//                                start = start.nextSibling;
-//                                start.nodeValue = start.nodeValue.replace(/^\s{4}/,'');
-//                                break;
-//                            }
-//                            while(start.previousSibling && start.previousSibling.nodeType == 3){
-//                                start.nodeValue = start.previousSibling.nodeValue + start.nodeValue;
-//                                domUtils.remove(start.previousSibling)
-//                            }
-//                            start = start.previousSibling;
-//                        }
-//                    }
-//                }
             }else{
                 if(!rng.collapsed){
                     var bk = rng.createBookmark();
@@ -546,6 +520,21 @@ UE.plugins['insertcode'] = function() {
                 }
 
             }
+        }
+    });
+    //trace:3395
+    me.addListener('delkeydown',function(type,evt){
+        var rng = this.selection.getRange();
+        rng.txtToElmBoundary(true);
+        var start = rng.startContainer;
+        if(domUtils.isTagNode(start,'pre') && rng.collapsed && domUtils.isStartInblock(rng)){
+            var p = me.document.createElement('p');
+            domUtils.fillNode(me.document,p);
+            start.parentNode.insertBefore(p,start);
+            domUtils.remove(start);
+            rng.setStart(p,0).setCursor(false,true);
+            domUtils.preventDefault(evt);
+            return true;
         }
     })
 };

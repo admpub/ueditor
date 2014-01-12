@@ -1,6 +1,31 @@
-//html字符串转换成uNode节点
-//by zhanyi
+/**
+ * html字符串转换成uNode节点
+ * @file
+ * @module UE
+ * @since 1.2.6.1
+ */
+
+/**
+ * UEditor公用空间，UEditor所有的功能都挂载在该空间下
+ * @unfile
+ * @module UE
+ */
+
+/**
+ * html字符串转换成uNode节点的静态方法
+ * @method htmlparser
+ * @param { String } htmlstr 要转换的html代码
+ * @param { Boolean } ignoreBlank 若设置为true，转换的时候忽略\n\r\t等空白字符
+ * @return { uNode } 给定的html片段转换形成的uNode对象
+ * @example
+ * ```javascript
+ * var root = UE.htmlparser('<p><b>htmlparser</b></p>', true);
+ * ```
+ */
+
 var htmlparser = UE.htmlparser = function (htmlstr,ignoreBlank) {
+    //todo 原来的方式  [^"'<>\/] 有\/就不能配对上 <TD vAlign=top background=../AAA.JPG> 这样的标签了
+    //先去掉了，加上的原因忘了，这里先记录
     var re_tag = /<(?:(?:\/([^>]+)>)|(?:!--([\S|\s]*?)-->)|(?:([^\s\/>]+)\s*((?:(?:"[^"]*")|(?:'[^']*')|[^"'<>])*)\/?>))/g,
         re_attr = /([\w\-:.]+)(?:(?:\s*=\s*(?:(?:"([^"]*)")|(?:'([^']*)')|([^\s>]+)))|(?=\s|$))/g;
 
@@ -9,16 +34,21 @@ var htmlparser = UE.htmlparser = function (htmlstr,ignoreBlank) {
         b:1,code:1,i:1,u:1,strike:1,s:1,tt:1,strong:1,q:1,samp:1,em:1,span:1,
         sub:1,img:1,sup:1,font:1,big:1,small:1,iframe:1,a:1,br:1,pre:1
     };
-    htmlstr = htmlstr
-        .replace(new RegExp(domUtils.fillChar, 'g'), '')
-        .replace(new RegExp('[\\r\\t\\n'+(ignoreBlank?'':' ')+']*<\/?(\\w+)\\s*(?:[^>]*)>[\\r\\t\\n'+(ignoreBlank?'':' ')+']*','g'), function(a,b){
+    htmlstr = htmlstr.replace(new RegExp(domUtils.fillChar, 'g'), '');
+    if(!ignoreBlank){
+        htmlstr = htmlstr.replace(new RegExp('[\\r\\t\\n'+(ignoreBlank?'':' ')+']*<\/?(\\w+)\\s*(?:[^>]*)>[\\r\\t\\n'+(ignoreBlank?'':' ')+']*','g'), function(a,b){
             //br暂时单独处理
             if(b && allowEmptyTags[b.toLowerCase()]){
                 return a.replace(/(^[\n\r]+)|([\n\r]+$)/g,'');
             }
             return a.replace(new RegExp('^[\\r\\n'+(ignoreBlank?'':' ')+']+'),'').replace(new RegExp('[\\r\\n'+(ignoreBlank?'':' ')+']+$'),'');
         });
+    }
 
+    var notTransAttrs = {
+        'href':1,
+        'src':1
+    };
 
     var uNode = UE.uNode,
         needParentNode = {
@@ -82,7 +112,7 @@ var htmlparser = UE.htmlparser = function (htmlstr,ignoreBlank) {
         if (htmlattr) {
             var attrs = {}, match;
             while (match = re_attr.exec(htmlattr)) {
-                attrs[match[1].toLowerCase()] = utils.unhtml(match[2] || match[3] || match[4])
+                attrs[match[1].toLowerCase()] = notTransAttrs[match[1].toLowerCase()] ? (match[2] || match[3] || match[4]) : utils.unhtml(match[2] || match[3] || match[4])
             }
             elm.attrs = attrs;
         }
@@ -107,6 +137,7 @@ var htmlparser = UE.htmlparser = function (htmlstr,ignoreBlank) {
         children:[]
     });
     var currentParent = root;
+
     while (match = re_tag.exec(htmlstr)) {
         currentIndex = match.index;
         try{
@@ -115,21 +146,32 @@ var htmlparser = UE.htmlparser = function (htmlstr,ignoreBlank) {
                 text(currentParent, htmlstr.slice(nextIndex, currentIndex));
             }
             if (match[3]) {
-                //start tag
-                currentParent = element(currentParent, match[3].toLowerCase(), match[4]);
+
+                if(dtd.$cdata[currentParent.tagName]){
+                    text(currentParent, match[0]);
+                }else{
+                    //start tag
+                    currentParent = element(currentParent, match[3].toLowerCase(), match[4]);
+                }
+
 
             } else if (match[1]) {
                 if(currentParent.type != 'root'){
-                    var tmpParent = currentParent;
-                    while(currentParent.type == 'element' && currentParent.tagName != match[1].toLowerCase()){
-                        currentParent = currentParent.parentNode;
-                        if(currentParent.type == 'root'){
-                            currentParent = tmpParent;
-                            throw 'break'
+                    if(dtd.$cdata[currentParent.tagName] && !dtd.$cdata[match[1]]){
+                        text(currentParent, match[0]);
+                    }else{
+                        var tmpParent = currentParent;
+                        while(currentParent.type == 'element' && currentParent.tagName != match[1].toLowerCase()){
+                            currentParent = currentParent.parentNode;
+                            if(currentParent.type == 'root'){
+                                currentParent = tmpParent;
+                                throw 'break'
+                            }
                         }
+                        //end tag
+                        currentParent = currentParent.parentNode;
                     }
-                    //end tag
-                    currentParent = currentParent.parentNode;
+
                 }
 
             } else if (match[2]) {

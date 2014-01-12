@@ -2,7 +2,7 @@
 ///commands 右键菜单
 ///commandsName  ContextMenu
 ///commandsTitle  右键菜单
-/**
+/*
  * 右键菜单
  * @function
  * @name baidu.editor.plugins.contextmenu
@@ -15,11 +15,6 @@ UE.plugins['contextmenu'] = function () {
             menu,
             items = me.options.contextMenu || [
                 {label:lang['selectall'], cmdName:'selectall'},
-                {
-                    label:lang.deletecode,
-                    cmdName:'highlightcode',
-                    icon:'deletehighlightcode'
-                },
                 {
                     label:lang.cleardoc,
                     cmdName:'cleardoc',
@@ -116,6 +111,14 @@ UE.plugins['contextmenu'] = function () {
                             label:lang.deletetitle,
                             cmdName:'deletetitle'
                         },
+                        {
+                            label:lang.inserttitlecol,
+                            cmdName:'inserttitlecol'
+                        },
+                        {
+                            label:lang.deletetitlecol,
+                            cmdName:'deletetitlecol'
+                        },
                         '-',
                         {
                             label:lang.mergecells,
@@ -171,6 +174,10 @@ UE.plugins['contextmenu'] = function () {
                                 }
                                 this.getDialog('edittable').open();
                             }
+                        },
+                        {
+                            label:lang.setbordervisible,
+                            cmdName:'setbordervisible'
                         }
                     ]
                 },
@@ -179,50 +186,38 @@ UE.plugins['contextmenu'] = function () {
                     icon:'tablesort',
                     subMenu:[
                         {
+                            label:lang.enablesort,
+                            cmdName:'enablesort'
+                        },
+                        {
+                            label:lang.disablesort,
+                            cmdName:'disablesort'
+                        },
+                        '-',
+                        {
                             label:lang.reversecurrent,
                             cmdName:'sorttable',
-                            value:1
+                            value:'reversecurrent'
                         },
                         {
                             label:lang.orderbyasc,
-                            cmdName:'sorttable'
+                            cmdName:'sorttable',
+                            value:'orderbyasc'
                         },
                         {
                             label:lang.reversebyasc,
                             cmdName:'sorttable',
-                            exec:function(){
-                                this.execCommand("sorttable",function(td1,td2){
-                                    var value1 = td1.innerHTML,
-                                        value2 = td2.innerHTML;
-                                    return value2.localeCompare(value1);
-                                });
-                            }
+                            value:'reversebyasc'
                         },
                         {
                             label:lang.orderbynum,
                             cmdName:'sorttable',
-                            exec:function(){
-                                this.execCommand("sorttable",function(td1,td2){
-                                    var value1 = td1.innerHTML.match(/\d+/),
-                                        value2 = td2.innerHTML.match(/\d+/);
-                                    if(value1) value1 = +value1[0];
-                                    if(value2) value2 = +value2[0];
-                                    return (value1||0) - (value2||0);
-                                });
-                            }
+                            value:'orderbynum'
                         },
                         {
                             label:lang.reversebynum,
                             cmdName:'sorttable',
-                            exec:function(){
-                                this.execCommand("sorttable",function(td1,td2){
-                                    var value1 = td1.innerHTML.match(/\d+/),
-                                        value2 = td2.innerHTML.match(/\d+/);
-                                    if(value1) value1 = +value1[0];
-                                    if(value2) value2 = +value2[0];
-                                    return (value2||0) - (value1||0);
-                                });
-                            }
+                            value:'reversebynum'
                         }
                     ]
                 },
@@ -369,15 +364,6 @@ UE.plugins['contextmenu'] = function () {
                     query:function () {
                         return 0;
                     }
-                },{
-                    label:lang['highlightcode'],
-                    cmdName:'highlightcode',
-                    exec:function () {
-                        if ( UE.ui['highlightcode'] ) {
-                            new UE.ui['highlightcode']( this );
-                        }
-                        this.ui._dialogs['highlightcodeDialog'].open();
-                    }
                 }
             ];
     if ( !items.length ) {
@@ -458,15 +444,7 @@ UE.plugins['contextmenu'] = function () {
                     //有可能commmand没有加载右键不能出来，或者没有command也想能展示出来添加query方法
                     if ( (me.commands[item.cmdName] || UE.commands[item.cmdName] || item.query) &&
                             (item.query ? item.query.call(me) : me.queryCommandState( item.cmdName )) > -1 ) {
-                        //highlight todo
-                        if ( item.cmdName == 'highlightcode' ) {
-                            if(me.queryCommandState( item.cmdName ) == 1 && item.icon != 'deletehighlightcode'){
-                                return;
-                            }
-                            if(me.queryCommandState( item.cmdName ) != 1 && item.icon == 'deletehighlightcode'){
-                                return;
-                            }
-                        }
+
                         contextItems.push( {
                             'label':item.label || me.getLang( "contextMenu." + item.cmdName ),
                             className:'edui-for-' + (item.icon ? item.icon : item.cmdName + (item.value || '')),
@@ -488,10 +466,14 @@ UE.plugins['contextmenu'] = function () {
 
         menu = new UE.ui.Menu( {
             items:contextItems,
+            className:"edui-contextmenu",
             editor:me
         } );
         menu.render();
         menu.showAt( offset );
+
+        me.fireEvent("aftershowcontextmenu",menu);
+
         domUtils.preventDefault( evt );
         if ( browser.ie ) {
             var ieRange;

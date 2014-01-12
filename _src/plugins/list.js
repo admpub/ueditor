@@ -1,22 +1,7 @@
-///import core
-///commands 有序列表,无序列表
-///commandsName  InsertOrderedList,InsertUnorderedList
-///commandsTitle  有序列表,无序列表
 /**
- * 有序列表
- * @function
- * @name baidu.editor.execCommand
- * @param   {String}   cmdName     insertorderlist插入有序列表
- * @param   {String}   style               值为：decimal,lower-alpha,lower-roman,upper-alpha,upper-roman
- * @author zhanyi
- */
-/**
- * 无序链接
- * @function
- * @name baidu.editor.execCommand
- * @param   {String}   cmdName     insertunorderlist插入无序列表
- * * @param   {String}   style            值为：circle,disc,square
- * @author zhanyi
+ * 有序列表,无序列表插件
+ * @file
+ * @since 1.2.6.1
  */
 
 UE.plugins['list'] = function () {
@@ -38,6 +23,7 @@ UE.plugins['list'] = function () {
     };
 
     me.setOpt( {
+        'autoTransWordToList':false,
         'insertorderedlist':{
             'num':'',
             'num1':'',
@@ -136,27 +122,31 @@ UE.plugins['list'] = function () {
         domUtils.on(me.body,'cut',function(){
             setTimeout(function(){
                 var rng = me.selection.getRange(),li;
-                if(li = domUtils.findParentByTagName(rng.startContainer,'li',true)){
-                    if(!li.nextSibling && domUtils.isEmptyBlock(li)){
-                        var pn = li.parentNode,node;
-                        if(node = pn.previousSibling){
-                            domUtils.remove(pn);
-                            rng.setStartAtLast(node).collapse(true);
-                            rng.select(true);
-                        }else if(node = pn.nextSibling){
-                            domUtils.remove(pn);
-                            rng.setStartAtFirst(node).collapse(true);
-                            rng.select(true);
-                        }else{
-                            var tmpNode = me.document.createElement('p');
-                            domUtils.fillNode(me.document,tmpNode);
-                            pn.parentNode.insertBefore(tmpNode,pn);
-                            domUtils.remove(pn);
-                            rng.setStart(tmpNode,0).collapse(true);
-                            rng.select(true);
+                //trace:3416
+                if(!rng.collapsed){
+                    if(li = domUtils.findParentByTagName(rng.startContainer,'li',true)){
+                        if(!li.nextSibling && domUtils.isEmptyBlock(li)){
+                            var pn = li.parentNode,node;
+                            if(node = pn.previousSibling){
+                                domUtils.remove(pn);
+                                rng.setStartAtLast(node).collapse(true);
+                                rng.select(true);
+                            }else if(node = pn.nextSibling){
+                                domUtils.remove(pn);
+                                rng.setStartAtFirst(node).collapse(true);
+                                rng.select(true);
+                            }else{
+                                var tmpNode = me.document.createElement('p');
+                                domUtils.fillNode(me.document,tmpNode);
+                                pn.parentNode.insertBefore(tmpNode,pn);
+                                domUtils.remove(pn);
+                                rng.setStart(tmpNode,0).collapse(true);
+                                rng.select(true);
+                            }
                         }
                     }
                 }
+
             })
         })
     });
@@ -229,74 +219,104 @@ UE.plugins['list'] = function () {
             if(tmpP.firstChild() && !tmpP.parentNode || !li.firstChild()){
                 li.appendChild(tmpP);
             }
+            //trace:3357
+            //p不能为空
+            if (!tmpP.firstChild()) {
+                tmpP.innerHTML(browser.ie ? '&nbsp;' : '<br/>')
+            }
+            //去掉末尾的空白
+            var p = li.firstChild();
+            var lastChild = p.lastChild();
+            if(lastChild && lastChild.type == 'text' && /^\s*$/.test(lastChild.data)){
+                p.removeChild(lastChild)
+            }
         });
-        var orderlisttype = {
-                'num1':/^\d+\)/,
-                'decimal':/^\d+\./,
-                'lower-alpha':/^[a-z]+\)/,
-                'upper-alpha':/^[A-Z]+\./,
-                'cn':/^[\u4E00\u4E8C\u4E09\u56DB\u516d\u4e94\u4e03\u516b\u4e5d]+[\u3001]/,
-                'cn2':/^\([\u4E00\u4E8C\u4E09\u56DB\u516d\u4e94\u4e03\u516b\u4e5d]+\)/
-            },
-            unorderlisttype = {
-                'square':'n'
-            };
-        function checkListType(content,container){
-            var span = container.firstChild();
-            if(span &&  span.type == 'element' && span.tagName == 'span' && /Wingdings|Symbol/.test(span.getStyle('font-family'))){
-                for(var p in unorderlisttype){
-                    if(unorderlisttype[p] == span.data){
-                        return p
+        if(me.options.autoTransWordToList){
+            var orderlisttype = {
+                    'num1':/^\d+\)/,
+                    'decimal':/^\d+\./,
+                    'lower-alpha':/^[a-z]+\)/,
+                    'upper-alpha':/^[A-Z]+\./,
+                    'cn':/^[\u4E00\u4E8C\u4E09\u56DB\u516d\u4e94\u4e03\u516b\u4e5d]+[\u3001]/,
+                    'cn2':/^\([\u4E00\u4E8C\u4E09\u56DB\u516d\u4e94\u4e03\u516b\u4e5d]+\)/
+                },
+                unorderlisttype = {
+                    'square':'n'
+                };
+            function checkListType(content,container){
+                var span = container.firstChild();
+                if(span &&  span.type == 'element' && span.tagName == 'span' && /Wingdings|Symbol/.test(span.getStyle('font-family'))){
+                    for(var p in unorderlisttype){
+                        if(unorderlisttype[p] == span.data){
+                            return p
+                        }
+                    }
+                    return 'disc'
+                }
+                for(var p in orderlisttype){
+                    if(orderlisttype[p].test(content)){
+                        return p;
                     }
                 }
-                return 'disc'
-            }
-            for(var p in orderlisttype){
-                if(orderlisttype[p].test(content)){
-                    return p;
-                }
-            }
 
-        }
-        utils.each(root.getNodesByTagName('p'),function(node){
-            if(node.getAttr('class') != 'MsoListParagraph'){
-                return
             }
-            node.setAttr('class','');
-            function appendLi(list,p,type){
-                if(list.tagName == 'ol'){
-                    p.innerHTML(p.innerHTML().replace(orderlisttype[type],''));
-                }else{
-                    p.removeChild(p.firstChild())
+            utils.each(root.getNodesByTagName('p'),function(node){
+                if(node.getAttr('class') != 'MsoListParagraph'){
+                    return
                 }
 
-                var li = UE.uNode.createElement('li');
-                li.appendChild(p);
-                list.appendChild(li);
-            }
-            var tmp = node,type;
+                //word粘贴过来的会带有margin要去掉,但这样也可能会误命中一些央视
+                node.setStyle('margin','');
+                node.setStyle('margin-left','');
+                node.setAttr('class','');
 
-            if(node.parentNode.tagName != 'li' && (type = checkListType(node.innerText(),node))){
+                function appendLi(list,p,type){
+                    if(list.tagName == 'ol'){
+                        if(browser.ie){
+                            var first = p.firstChild();
+                            if(first.type =='element' && first.tagName == 'span' && orderlisttype[type].test(first.innerText())){
+                                p.removeChild(first);
+                            }
+                        }else{
+                            p.innerHTML(p.innerHTML().replace(orderlisttype[type],''));
+                        }
+                    }else{
+                        p.removeChild(p.firstChild())
+                    }
 
-                var list = UE.uNode.createElement(me.options.insertorderedlist.hasOwnProperty(type) ? 'ol' : 'ul');
-                if(customStyle[type]){
-                    list.setAttr('class','custom_'+type)
-                }else{
-                    list.setStyle('list-style-type',type)
+                    var li = UE.uNode.createElement('li');
+                    li.appendChild(p);
+                    list.appendChild(li);
                 }
-                while(node && node.parentNode.tagName != 'li' && checkListType(node.innerText(),node)){
-                    tmp = node.nextSibling();
-                    if(!tmp){
+                var tmp = node,type,cacheNode = node;
+
+                if(node.parentNode.tagName != 'li' && (type = checkListType(node.innerText(),node))){
+
+                    var list = UE.uNode.createElement(me.options.insertorderedlist.hasOwnProperty(type) ? 'ol' : 'ul');
+                    if(customStyle[type]){
+                        list.setAttr('class','custom_'+type)
+                    }else{
+                        list.setStyle('list-style-type',type)
+                    }
+                    while(node && node.parentNode.tagName != 'li' && checkListType(node.innerText(),node)){
+                        tmp = node.nextSibling();
+                        if(!tmp){
+                            node.parentNode.insertBefore(list,node)
+                        }
+                        appendLi(list,node,type);
+                        node = tmp;
+                    }
+                    if(!list.parentNode && node && node.parentNode){
                         node.parentNode.insertBefore(list,node)
                     }
-                    appendLi(list,node,type);
-                    node = tmp;
                 }
-                if(!list.parentNode && node && node.parentNode){
-                    node.parentNode.insertBefore(list,node)
+                var span = cacheNode.firstChild();
+                if(span && span.type == 'element' && span.tagName == 'span' && /^\s*(&nbsp;)+\s*$/.test(span.innerText())){
+                    span.parentNode.removeChild(span)
                 }
-            }
-        })
+            })
+        }
+
     });
 
     //调整索引标签
@@ -832,6 +852,75 @@ UE.plugins['list'] = function () {
             start = start.parentNode;
         }
     }
+
+    /**
+     * 有序列表，与“insertunorderedlist”命令互斥
+     * @command insertorderedlist
+     * @method execCommand
+     * @param { String } command 命令字符串
+     * @param { String } style 插入的有序列表类型，值为：decimal,lower-alpha,lower-roman,upper-alpha,upper-roman,cn,cn1,cn2,num,num1,num2
+     * @example
+     * ```javascript
+     * editor.execCommand( 'insertunorderedlist','decimal');
+     * ```
+     */
+    /**
+     * 查询当前选区内容是否有序列表
+     * @command insertorderedlist
+     * @method queryCommandState
+     * @param { String } cmd 命令字符串
+     * @return { int } 如果当前选区是有序列表返回1，否则返回0
+     * @example
+     * ```javascript
+     * editor.queryCommandState( 'insertorderedlist' );
+     * ```
+     */
+    /**
+     * 查询当前选区内容是否有序列表
+     * @command insertorderedlist
+     * @method queryCommandValue
+     * @param { String } cmd 命令字符串
+     * @return { String } 返回当前有序列表的类型，值为null或decimal,lower-alpha,lower-roman,upper-alpha,upper-roman,cn,cn1,cn2,num,num1,num2
+     * @example
+     * ```javascript
+     * editor.queryCommandValue( 'insertorderedlist' );
+     * ```
+     */
+
+    /**
+     * 无序列表，与“insertorderedlist”命令互斥
+     * @command insertunorderedlist
+     * @method execCommand
+     * @param { String } command 命令字符串
+     * @param { String } style 插入的无序列表类型，值为：circle,disc,square,dash,dot
+     * @example
+     * ```javascript
+     * editor.execCommand( 'insertunorderedlist','circle');
+     * ```
+     */
+    /**
+     * 查询当前是否有word文档粘贴进来的图片
+     * @command insertunorderedlist
+     * @method insertunorderedlist
+     * @param { String } command 命令字符串
+     * @return { int } 如果当前选区是无序列表返回1，否则返回0
+     * @example
+     * ```javascript
+     * editor.queryCommandState( 'insertunorderedlist' );
+     * ```
+     */
+    /**
+     * 查询当前选区内容是否有序列表
+     * @command insertunorderedlist
+     * @method queryCommandValue
+     * @param { String } command 命令字符串
+     * @return { String } 返回当前无序列表的类型，值为null或circle,disc,square,dash,dot
+     * @example
+     * ```javascript
+     * editor.queryCommandValue( 'insertunorderedlist' );
+     * ```
+     */
+
     me.commands['insertorderedlist'] =
     me.commands['insertunorderedlist'] = {
             execCommand:function (command, style) {
@@ -896,17 +985,21 @@ UE.plugins['list'] = function () {
                         }
                         var nodeStyle = getStyle(startParent) || domUtils.getComputedStyle(startParent, 'list-style-type') || (command.toLowerCase() == 'insertorderedlist' ? 'decimal' : 'disc');
                         if (startParent.tagName.toLowerCase() == tag && nodeStyle == style) {
-                            for (var i = 0, ci, tmpFrag = me.document.createDocumentFragment(); ci = frag.childNodes[i++];) {
+                            for (var i = 0, ci, tmpFrag = me.document.createDocumentFragment(); ci = frag.firstChild;) {
                                 if(domUtils.isTagNode(ci,'ol ul')){
-                                    utils.each(domUtils.getElementsByTagName(ci,'li'),function(li){
-                                        while(li.firstChild){
-                                            tmpFrag.appendChild(li.firstChild);
-                                        }
-
-                                    });
+//                                  删除时，子列表不处理
+//                                  utils.each(domUtils.getElementsByTagName(ci,'li'),function(li){
+//                                        while(li.firstChild){
+//                                            tmpFrag.appendChild(li.firstChild);
+//                                        }
+//
+//                                    });
+                                    tmpFrag.appendChild(ci);
                                 }else{
                                     while (ci.firstChild) {
+
                                         tmpFrag.appendChild(ci.firstChild);
+                                        domUtils.remove(ci);
                                     }
                                 }
 
