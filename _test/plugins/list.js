@@ -12,7 +12,8 @@ module("plugins.list");
  * */
 
 //test('',function(){stop();})
-test('回车将p转成列表', function () {
+test('trace 3859 回车将p转成列表', function () {
+    if(ua.browser.ie==9||ua.browser.ie==10)return;
     var editor = te.obj[0];
     var range = te.obj[1];
     var br = ua.browser.ie ? '' : '<br>';
@@ -46,7 +47,8 @@ test('p转成列表', function () {
     var div = document.body.appendChild(document.createElement('div'));
     div.id = 'ue';
     var editor = UE.getEditor('ue',{autoTransWordToList:true});
-    var br = ua.browser.ie ? '&nbsp;' : '<br>';
+//    var br = ua.browser.ie ? '&nbsp;' : '';
+    var br = '';
     editor.ready(function () {
         setTimeout(function(){
             editor.setContent('<p class="MsoListParagraph">1.a</p><ol><li>b</li></ol>');
@@ -830,7 +832,7 @@ test('trace 3132：单行列表backspace', function () {
         editor.setContent('<ol><li><br></li></ol>');
         range.selectNode(editor.body.firstChild.firstChild.firstChild.firstChild).select();
         ua.keydown(editor.body, {keyCode:8});
-        var space =ua.browser.ie>8?'':'<br>';
+        var space ='<br>';
         equal(ua.getChildHTML(editor.body), '<p>'+space+'</p>', '');
 
 });
@@ -892,11 +894,15 @@ test('trace 3165：检查表格中列表tab键', function () {
             tds = body.getElementsByTagName('td');
             range.setStart(tds[5], 0).collapse(1).select();
             range = editor.selection.getRange();
-            equal(range.startContainer.parentNode.tagName.toLowerCase(), 'td', 'tab键前光标位于td中');
+            if(ua.browser.ie==9||ua.browser.ie==10)
+                equal(range.startContainer.tagName.toLowerCase(), 'td', 'tab键前光标位于td中');
+
+            else
+                equal(range.startContainer.parentNode.tagName.toLowerCase(), 'td', 'tab键前光标位于td中');
             ua.keydown(editor.body, {keyCode:9});
             setTimeout(function () {
                 range = editor.selection.getRange();
-                if (!ua.browser.gecko && !ua.browser.ie)//TODO 1.2.6
+                if (!ua.browser.gecko && !ua.browser.ie && !ua.browser.webkit)//TODO 1.2.6
                     equal(range.startContainer.parentNode.tagName.toLowerCase(), 'li', 'tab键后光标跳到有列表的单元格中');
                 equal(tds[6].firstChild.style['listStyleType'], 'decimal', '检查有序列表的类型不应该被改变');
                 start();

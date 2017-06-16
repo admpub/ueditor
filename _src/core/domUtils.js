@@ -1115,7 +1115,7 @@ var domUtils = dom.domUtils = {
         remove('lastChild');
     },
 
-    /*
+    /**
      * 合并node节点下相同的子节点
      * @name mergeChild
      * @desc
@@ -1323,7 +1323,7 @@ var domUtils = dom.domUtils = {
      * UE.dom.domUtils.unSelectable( document.body );
      * ```
      */
-    unSelectable:ie || browser.opera ? function (node) {
+    unSelectable:ie && browser.ie9below || browser.opera ? function (node) {
         //for ie9
         node.onselectstart = function () {
             return false;
@@ -1348,7 +1348,8 @@ var domUtils = dom.domUtils = {
     } : function (node) {
         node.style.MozUserSelect =
             node.style.webkitUserSelect =
-                node.style.KhtmlUserSelect = 'none';
+                node.style.msUserSelect =
+                    node.style.KhtmlUserSelect = 'none';
     },
     /**
      * 删除节点node上的指定属性名称的属性
@@ -1403,7 +1404,8 @@ var domUtils = dom.domUtils = {
                     break;
                 case 'style':
                     node.style.cssText = '';
-                    !browser.ie && node.removeAttributeNode(node.getAttributeNode('style'))
+                    var val = node.getAttributeNode('style');
+                    !browser.ie && val && node.removeAttributeNode(val);
             }
             node.removeAttribute(ci);
         }
@@ -2078,7 +2080,8 @@ var domUtils = dom.domUtils = {
     isEmptyBlock:function (node,reg) {
         if(node.nodeType != 1)
             return 0;
-        reg = reg || new RegExp('[ \t\r\n' + domUtils.fillChar + ']', 'g');
+        reg = reg || new RegExp('[ \xa0\t\r\n' + domUtils.fillChar + ']', 'g');
+
         if (node[browser.ie ? 'innerText' : 'textContent'].replace(reg, '').length > 0) {
             return 0;
         }
@@ -2404,6 +2407,7 @@ var domUtils = dom.domUtils = {
             }
         }
         return true;
-    }
+    },
+    fillHtml :  browser.ie11below ? '&nbsp;' : '<br/>'
 };
 var fillCharReg = new RegExp(domUtils.fillChar, 'g');
